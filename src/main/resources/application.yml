@@ -9,3 +9,14 @@ springdoc:
   swagger-ui:
     path: /swagger-ui # Swagger UI 경로 (기본: /swagger-ui.html)
 
+#구글 로그인
+google:
+  oauth:
+    user-info-url: https://www.googleapis.com/oauth2/v2/userinfo
+
+#aws
+aws:
+  s3: #이미지 저장소
+    bucket: my-bucket-name
+    region: ap-northeast-2
+
