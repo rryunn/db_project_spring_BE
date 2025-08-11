@@ -28,7 +28,7 @@ public class LoginService implements LoginUseCase {
     }
 
     public User findByUserId(LoginDto loginDto) throws Exception {
-        String userId = loginDto.getUserId();
+        Long userId = loginDto.getUserId();
         return loginUserPort.findByUserId(userId);
     }
 }

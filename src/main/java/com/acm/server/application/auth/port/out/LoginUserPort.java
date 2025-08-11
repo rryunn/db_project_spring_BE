@@ -4,5 +4,5 @@ package com.acm.server.application.auth.port.out;
 import com.acm.server.domain.User;
 
 public interface LoginUserPort {
-    public User findByUserId(String userId);
+    public User findByUserId(Long userId);
 }

@@ -4,5 +4,5 @@ import lombok.Getter;
 
 @Getter
 public class LoginDto {
-    private String userId;
+    private Long userId;
 }
