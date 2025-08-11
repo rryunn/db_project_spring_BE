@@ -1,24 +1,28 @@
 package com.acm.server.adapter.out.persistence.user;
 
 import com.acm.server.adapter.out.entity.UserEntity;
+import com.acm.server.application.auth.port.out.LoginUserPort;
+import com.acm.server.domain.User;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
-public class UserPersistenceAdapter {
-    //예시
-    // private final JpaUserRepository jpaUserRepository;
+@Repository
+@RequiredArgsConstructor
+public class UserPersistenceAdapter implements LoginUserPort {
 
-    // @Override
-    // public User findByUserId(String userId) {
-    //     UserEntity userEntity = jpaUserRepository.findByUserId(userId);
-    //     User user = new User();
-    //     if(userEntity == null) return null;
+    private final JpaUserRepository jpaUserRepository;
 
-    //     user = User.builder()
-    //             .userSeq(userEntity.getUserSeq())
-    //             .userId(userEntity.getUserId())
-    //             .userPw(userEntity.getUserPw())
-    //             .phoneNumber(userEntity.getPhoneNumber())
-    //             .build();
+    @Override
+    public User findByUserId(Long userId) {
+        UserEntity entity = jpaUserRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-    //     return user;
-    // }
+        return User.builder()
+                   .id(entity.getId())
+                   .name(entity.getName())
+                   .email(entity.getEmail())
+                   .profilePic(entity.getProfilePic())
+                   .googleId(entity.getGoogleId())
+                   .build();
+    }
 }

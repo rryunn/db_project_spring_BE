@@ -1,5 +1,32 @@
 package com.acm.server.adapter.out.entity;
 
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+
+@Entity
+@Table(name = "users")
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class UserEntity {
-    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
+    private Long id;
+
+    @Column(name = "user_name", unique = true)
+    private String name;
+
+    @Column(name="user_email", unique =true)
+    private String email;
+
+    @Column(name = "profile_picture")
+    private String profilePic;
+
+    @Column(name="google_id", unique =true)
+    private String googleId;
 }
