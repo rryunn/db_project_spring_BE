@@ -1,5 +1,8 @@
 package com.acm.server.adapter.in.response;
 
+import lombok.Getter;
+
+@Getter
 public class Response {
     int status;
     String message;
