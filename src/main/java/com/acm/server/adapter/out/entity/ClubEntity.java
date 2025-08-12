@@ -40,8 +40,8 @@ public class ClubEntity {
     @Column(name = "club_contact_phone_number", length = 15)
     private String contactPhoneNumber;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "club_category", nullable = false)
+    @Convert(converter = ClubCategoryConverter.class)
     private ClubCategory category;
 
     @Column(name = "club_sns1", length = 255)
