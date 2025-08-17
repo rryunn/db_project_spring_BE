@@ -26,6 +26,9 @@ public class RecruitmentEntity {
     @JoinColumn(name = "club_id", nullable = false)
     private ClubEntity club;
 
+    @Column(name ="recruitment_title")
+    private String title;
+
     @Column(name ="recruitment_description")
     private String description;
 
