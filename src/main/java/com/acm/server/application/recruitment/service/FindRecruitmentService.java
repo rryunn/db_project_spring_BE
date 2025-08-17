@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -16,6 +17,16 @@ public class FindRecruitmentService implements FindRecruitmentUseCase {
     @Override
     public List<Recruitment> findAllRecruitment() {
         return findRecruitmentPort.findAllRecruitment();
+    }
+
+    @Override
+    public Optional<Recruitment> findRecruitmentById(Long id) {
+        return findRecruitmentPort.findRecruitmentById(id);
+    }
+
+    @Override
+    public void deleteRecruitmentById(Long id) {
+        findRecruitmentPort.deleteRecruitmentById(id);
     }
 }
 

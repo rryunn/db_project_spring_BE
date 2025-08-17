@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -20,6 +21,18 @@ public class RecruitmentPersistenceAdapter implements FindRecruitmentPort {
                 .map(this::mapToDomain)
                 .toList();
     }
+
+    @Override
+    public Optional<Recruitment> findRecruitmentById(Long id){
+        return jpaRecruitmentRepository.findById(id)
+                .map(this::mapToDomain);
+    }
+
+    @Override
+    public void deleteRecruitmentById(Long id) {
+        jpaRecruitmentRepository.deleteById(id);
+    }
+
 
     private Recruitment mapToDomain(RecruitmentEntity entity) {
         return Recruitment.builder()
