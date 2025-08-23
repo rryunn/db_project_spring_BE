@@ -20,13 +20,13 @@ public class FindRecruitmentService implements FindRecruitmentUseCase {
     }
 
     @Override
-    public Optional<Recruitment> findRecruitmentById(Long id) {
-        return findRecruitmentPort.findRecruitmentById(id);
+    public Optional<Recruitment> findRecruitmentByClubId(Long clubId) {
+        return findRecruitmentPort.findRecruitmentByClubId(clubId);
     }
 
     @Override
-    public void deleteRecruitmentById(Long id) {
-        findRecruitmentPort.deleteRecruitmentById(id);
+    public void deleteRecruitmentById(Long clubId) {
+        findRecruitmentPort.deleteRecruitmentById(clubId);
     }
 }
 

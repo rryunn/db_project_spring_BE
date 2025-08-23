@@ -7,6 +7,6 @@ import java.util.Optional;
 
 public interface FindRecruitmentPort {
     List<Recruitment> findAllRecruitment();
-    Optional<Recruitment> findRecruitmentById(Long id);
-    void deleteRecruitmentById(Long id);
+    Optional<Recruitment> findRecruitmentByClubId(Long clubId);
+    void deleteRecruitmentById(Long clubId);
 }
