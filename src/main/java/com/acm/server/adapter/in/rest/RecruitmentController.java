@@ -5,6 +5,7 @@ import com.acm.server.adapter.in.response.Response;
 import com.acm.server.application.recruitment.port.in.CreateRecruitmentUseCase;
 import com.acm.server.application.recruitment.port.in.FindRecruitmentUseCase;
 import com.acm.server.application.recruitment.port.in.RecruitmentCommand;
+import com.acm.server.application.recruitment.port.in.UpdateRecruitmentUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ public class RecruitmentController {
 
     private final FindRecruitmentUseCase findRecruitmentUseCase;
     private final CreateRecruitmentUseCase createRecruitmentUseCase;
+    private final UpdateRecruitmentUseCase updateRecruitmentUseCase;
     @GetMapping
     public Response getRecruitments() {
         var data = findRecruitmentUseCase.findAllRecruitment(); // 그냥 domain 반환
@@ -43,4 +45,9 @@ public class RecruitmentController {
         return new Response(201,"created", created);
     }
 
+    @PutMapping("/{clubId}")
+    public Response updateRecruitment(@PathVariable Long clubId, @RequestBody @Valid RecruitmentRequest req) {
+        var updated = updateRecruitmentUseCase.updateRecruitment(req.toCommand(clubId));
+        return new Response(200, "success", updated);
+    }
 }

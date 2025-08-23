@@ -4,6 +4,7 @@ import com.acm.server.adapter.out.entity.RecruitmentEntity;
 import com.acm.server.adapter.out.persistence.club.JpaClubRepository;
 import com.acm.server.application.recruitment.port.out.CreateRecruitmentPort;
 import com.acm.server.application.recruitment.port.out.FindRecruitmentPort;
+import com.acm.server.application.recruitment.port.out.UpdateRecruitmentPort;
 import com.acm.server.domain.Recruitment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -14,7 +15,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class RecruitmentPersistenceAdapter implements FindRecruitmentPort, CreateRecruitmentPort {
+public class RecruitmentPersistenceAdapter implements FindRecruitmentPort, CreateRecruitmentPort, UpdateRecruitmentPort {
 
     private final JpaRecruitmentRepository jpaRecruitmentRepository;
     private final JpaClubRepository jpaClubRepository;
@@ -38,6 +39,7 @@ public class RecruitmentPersistenceAdapter implements FindRecruitmentPort, Creat
     }
 
     @Override
+    @Transactional
     public Recruitment save(Recruitment d) {
         var club = jpaClubRepository.findById(d.getClubId())
                 .orElseThrow(() -> new IllegalArgumentException("club not found: " + d.getClubId()));
@@ -60,6 +62,7 @@ public class RecruitmentPersistenceAdapter implements FindRecruitmentPort, Creat
         var saved = jpaRecruitmentRepository.save(entity);
         return mapToDomain(saved);
     }
+
     private Recruitment mapToDomain(RecruitmentEntity entity) {
         return Recruitment.builder()
                 .id(entity.getId())
