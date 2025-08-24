@@ -68,6 +68,9 @@ public class ClubEntity {
     @Column(name = "logo_url", length = 255)
     private String logoUrl;
 
+    @Column(name = "is_recruiting", nullable = false)
+    private boolean recruiting;  // ✅ 모집 여부
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();

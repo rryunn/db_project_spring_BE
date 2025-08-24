@@ -1,8 +1,10 @@
 package com.acm.server.adapter.out.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 
 @Entity
+@Getter
 @Table(name = "academic_club_details")
 public class AcademicClubEntity {
 
