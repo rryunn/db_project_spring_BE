@@ -7,8 +7,11 @@ import org.springframework.stereotype.Service;
 
 import com.acm.server.adapter.in.dto.FindClubDto;
 import com.acm.server.adapter.in.response.Response;
+import com.acm.server.adapter.out.entity.ClubEntity;
 import com.acm.server.application.club.port.in.FindClubUseCase;
 import com.acm.server.application.club.port.out.FindClubPort;
+import com.acm.server.domain.AcademicClub;
+import com.acm.server.domain.CentralClub;
 import com.acm.server.domain.Club;
 
 import lombok.RequiredArgsConstructor;
@@ -20,33 +23,27 @@ public class FindClubService implements FindClubUseCase{
     private final FindClubPort findClubPort;
 
     @Override
-    public Response findAllClub() {
-        List<Club> clubList = findClubPort.findAllClub();
-        return new Response(200, "Success", clubList);
+    public List<Club> findAllClub() {
+        return findClubPort.findAllClub();
     }
 
     @Override
-    public Response findAcademicClub(FindClubDto findClubDto) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findAcademicClub'");
+    public CentralClub findCentralClub(Long clubId) {
+        return findClubPort.findCentralClub(clubId);
     }
 
     @Override
-    public Response findCentralClub(FindClubDto findClubDto) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findCentralClub'");
+    public AcademicClub findAcademicClub(Long clubId) {
+        return findClubPort.findAcademicClub(clubId);
     }
 
     @Override
-    public Response findCategoryClub(FindClubDto findClubDto) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findCategoryClub'");
+    public List<Club> findFilterClub(String type, String category,Boolean isRecruiting, String department){
+        
+        // 중앙동아리일 경우 department 무시
+        if ("CENTRAL".equalsIgnoreCase(type)) {
+            department = null;
+        }
+        return findClubPort.findFilterClub(type, category, isRecruiting, department);
     }
-
-    @Override
-    public Response findClub(FindClubDto findClubDto) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findClub'");
-    }
-    
 }
