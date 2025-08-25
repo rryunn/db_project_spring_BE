@@ -9,4 +9,8 @@ public class Club {
     private Long id;
     private String name;
     private String description;
+    private String clubType;
+    private String logoUrl;
+    private String category;
+    private boolean isRecruiting;
 }
