@@ -9,4 +9,5 @@ public interface FindRecruitmentPort {
     List<Recruitment> findAllRecruitment();
     Optional<Recruitment> findRecruitmentByClubId(Long clubId);
     void deleteRecruitmentById(Long clubId);
+    List<Recruitment> getMainRecruitment();
 }

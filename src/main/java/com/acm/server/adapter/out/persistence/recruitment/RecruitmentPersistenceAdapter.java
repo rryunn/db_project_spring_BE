@@ -7,9 +7,12 @@ import com.acm.server.application.recruitment.port.out.FindRecruitmentPort;
 import com.acm.server.application.recruitment.port.out.UpdateRecruitmentPort;
 import com.acm.server.domain.Recruitment;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,6 +36,18 @@ public class RecruitmentPersistenceAdapter implements FindRecruitmentPort, Creat
     }
 
     @Override
+    public List<Recruitment> getMainRecruitment() {
+        Pageable limit = PageRequest.of(0, 60);
+        LocalDate today = LocalDate.now();
+
+        List<RecruitmentEntity> entities = jpaRecruitmentRepository
+                .findByEndDateAfterOrderByEndDateAsc(today, limit);
+
+        return entities.stream()
+                .map(this::mapToDomain)
+                .toList();
+    }
+
     @Transactional
     public void deleteRecruitmentById(Long clubId) {
         jpaRecruitmentRepository.deleteByClub_Id(clubId);

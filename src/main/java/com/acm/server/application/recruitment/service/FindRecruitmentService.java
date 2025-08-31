@@ -28,5 +28,10 @@ public class FindRecruitmentService implements FindRecruitmentUseCase {
     public void deleteRecruitmentById(Long clubId) {
         findRecruitmentPort.deleteRecruitmentById(clubId);
     }
+
+    @Override
+    public List<Recruitment> getMainRecruitment() {
+        return findRecruitmentPort.getMainRecruitment();
+    }
 }
 

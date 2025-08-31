@@ -10,4 +10,5 @@ public interface FindRecruitmentUseCase {
     List<Recruitment> findAllRecruitment();
     Optional<Recruitment> findRecruitmentByClubId(Long clubId);
     void deleteRecruitmentById(Long clubId);
+    List<Recruitment> getMainRecruitment();
 }

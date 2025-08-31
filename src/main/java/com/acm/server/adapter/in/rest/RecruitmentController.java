@@ -30,6 +30,11 @@ public class RecruitmentController {
         var data = findRecruitmentUseCase.findRecruitmentByClubId(clubId);
         return new Response(200, "success", data);
     }
+    @GetMapping("/main")
+    public Response getMainRecruitment() {
+        var data = findRecruitmentUseCase.getMainRecruitment();
+        return new Response(200, "success", data);
+    }
     @DeleteMapping("/{clubId}")
     public void deleteRecruitmentById(@PathVariable Long clubId) {
         findRecruitmentUseCase.deleteRecruitmentById(clubId);
