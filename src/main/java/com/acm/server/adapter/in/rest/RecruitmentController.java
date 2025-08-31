@@ -8,8 +8,12 @@ import com.acm.server.application.recruitment.port.in.RecruitmentCommand;
 import com.acm.server.application.recruitment.port.in.UpdateRecruitmentUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
+import jdk.jfr.Description;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/recruitments")
@@ -34,6 +38,12 @@ public class RecruitmentController {
     public Response getMainRecruitment() {
         var data = findRecruitmentUseCase.getMainRecruitment();
         return new Response(200, "success", data);
+    }
+    @GetMapping("/{id}/images")
+    @Operation(summary = "모집공고 이미지 조회", description = "모집공고 id를 이용해 해당 공고에 등록된 이미지 URL 리스트를 조회합니다.")
+    public ResponseEntity<List<String>> getRecruitmentImages(@PathVariable Long id) {
+        List<String> imageUrls = findRecruitmentUseCase.getRecruitmentImageUrls(id);
+        return ResponseEntity.ok(imageUrls);
     }
     @DeleteMapping("/{clubId}")
     public void deleteRecruitmentById(@PathVariable Long clubId) {

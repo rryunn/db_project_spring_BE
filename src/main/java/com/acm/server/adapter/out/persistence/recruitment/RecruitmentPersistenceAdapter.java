@@ -1,6 +1,7 @@
 package com.acm.server.adapter.out.persistence.recruitment;
 
 import com.acm.server.adapter.out.entity.RecruitmentEntity;
+import com.acm.server.adapter.out.entity.RecruitmentImage;
 import com.acm.server.adapter.out.persistence.club.JpaClubRepository;
 import com.acm.server.application.recruitment.port.out.CreateRecruitmentPort;
 import com.acm.server.application.recruitment.port.out.FindRecruitmentPort;
@@ -22,6 +23,9 @@ public class RecruitmentPersistenceAdapter implements FindRecruitmentPort, Creat
 
     private final JpaRecruitmentRepository jpaRecruitmentRepository;
     private final JpaClubRepository jpaClubRepository;
+    private final JpaRecruitmentImageRepository recruitmentImageRepository;
+
+
     @Override
     public List<Recruitment> findAllRecruitment() {
         return jpaRecruitmentRepository.findAll().stream()
@@ -95,4 +99,12 @@ public class RecruitmentPersistenceAdapter implements FindRecruitmentPort, Creat
                 .updatedAt(entity.getUpdatedAt())
                 .build();
     }
+
+    @Override
+    public List<String> getRecruitmentImageUrls(Long id) {
+        return recruitmentImageRepository.findByRecruitment_Id(id).stream()
+                .map(RecruitmentImage::getImageUrl)
+                .toList();
+    }
+
 }

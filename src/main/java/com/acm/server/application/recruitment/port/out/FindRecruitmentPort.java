@@ -1,5 +1,6 @@
 package com.acm.server.application.recruitment.port.out;
 
+import com.acm.server.adapter.out.entity.RecruitmentImage;
 import com.acm.server.domain.Recruitment;
 
 import java.util.List;
@@ -10,4 +11,5 @@ public interface FindRecruitmentPort {
     Optional<Recruitment> findRecruitmentByClubId(Long clubId);
     void deleteRecruitmentById(Long clubId);
     List<Recruitment> getMainRecruitment();
+    List<String> getRecruitmentImageUrls(Long id);
 }

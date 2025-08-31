@@ -1,6 +1,7 @@
 package com.acm.server.adapter.out.persistence.recruitment;
 //db 모집공고 테이블이랑 entity를 연결해주는 인터페이스
 import com.acm.server.adapter.out.entity.RecruitmentEntity;
+import com.acm.server.adapter.out.entity.RecruitmentImage;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
