@@ -1,19 +1,30 @@
 package com.acm.server.adapter.out.persistence.recruitment;
 
 import com.acm.server.adapter.out.entity.RecruitmentEntity;
+import com.acm.server.adapter.out.entity.RecruitmentImage;
+import com.acm.server.adapter.out.persistence.club.JpaClubRepository;
+import com.acm.server.application.recruitment.port.out.CreateRecruitmentPort;
 import com.acm.server.application.recruitment.port.out.FindRecruitmentPort;
+import com.acm.server.application.recruitment.port.out.UpdateRecruitmentPort;
 import com.acm.server.domain.Recruitment;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class RecruitmentPersistenceAdapter implements FindRecruitmentPort {
+public class RecruitmentPersistenceAdapter implements FindRecruitmentPort, CreateRecruitmentPort, UpdateRecruitmentPort {
 
     private final JpaRecruitmentRepository jpaRecruitmentRepository;
+    private final JpaClubRepository jpaClubRepository;
+    private final JpaRecruitmentImageRepository recruitmentImageRepository;
+
 
     @Override
     public List<Recruitment> findAllRecruitment() {
@@ -23,16 +34,53 @@ public class RecruitmentPersistenceAdapter implements FindRecruitmentPort {
     }
 
     @Override
-    public Optional<Recruitment> findRecruitmentById(Long id){
-        return jpaRecruitmentRepository.findById(id)
+    public Optional<Recruitment> findRecruitmentByClubId(Long clubId){
+        return jpaRecruitmentRepository.findByClubId(clubId)
                 .map(this::mapToDomain);
     }
 
     @Override
-    public void deleteRecruitmentById(Long id) {
-        jpaRecruitmentRepository.deleteById(id);
+    public List<Recruitment> getMainRecruitment() {
+        Pageable limit = PageRequest.of(0, 60);
+        LocalDate today = LocalDate.now();
+
+        List<RecruitmentEntity> entities = jpaRecruitmentRepository
+                .findByEndDateAfterOrderByEndDateAsc(today, limit);
+
+        return entities.stream()
+                .map(this::mapToDomain)
+                .toList();
     }
 
+    @Transactional
+    public void deleteRecruitmentById(Long clubId) {
+        jpaRecruitmentRepository.deleteByClub_Id(clubId);
+    }
+
+    @Override
+    @Transactional
+    public Recruitment save(Recruitment d) {
+        var club = jpaClubRepository.findById(d.getClubId())
+                .orElseThrow(() -> new IllegalArgumentException("club not found: " + d.getClubId()));
+
+        var entity = RecruitmentEntity.builder()
+                .id(d.getId()) // 생성이면 null
+                .club(club)
+                .title(d.getTitle())
+                .description(d.getDescription())
+                .type(d.getType())
+                .phoneNumber(d.getPhoneNumber())
+                .email(d.getEmail())
+                .startDate(d.getStartDate())
+                .endDate(d.getEndDate())
+                .url(d.getUrl())
+                .createdAt(d.getCreatedAt())
+                .updatedAt(d.getUpdatedAt())
+                .build();
+
+        var saved = jpaRecruitmentRepository.save(entity);
+        return mapToDomain(saved);
+    }
 
     private Recruitment mapToDomain(RecruitmentEntity entity) {
         return Recruitment.builder()
@@ -51,4 +99,12 @@ public class RecruitmentPersistenceAdapter implements FindRecruitmentPort {
                 .updatedAt(entity.getUpdatedAt())
                 .build();
     }
+
+    @Override
+    public List<String> getRecruitmentImageUrls(Long id) {
+        return recruitmentImageRepository.findByRecruitment_Id(id).stream()
+                .map(RecruitmentImage::getImageUrl)
+                .toList();
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.acm.server.application.recruitment.service;
 
+import com.acm.server.adapter.out.entity.RecruitmentImage;
 import com.acm.server.application.recruitment.port.in.FindRecruitmentUseCase;
 import com.acm.server.application.recruitment.port.out.FindRecruitmentPort;
 import com.acm.server.domain.Recruitment;
@@ -20,13 +21,23 @@ public class FindRecruitmentService implements FindRecruitmentUseCase {
     }
 
     @Override
-    public Optional<Recruitment> findRecruitmentById(Long id) {
-        return findRecruitmentPort.findRecruitmentById(id);
+    public Optional<Recruitment> findRecruitmentByClubId(Long clubId) {
+        return findRecruitmentPort.findRecruitmentByClubId(clubId);
     }
 
     @Override
-    public void deleteRecruitmentById(Long id) {
-        findRecruitmentPort.deleteRecruitmentById(id);
+    public void deleteRecruitmentById(Long clubId) {
+        findRecruitmentPort.deleteRecruitmentById(clubId);
+    }
+
+    @Override
+    public List<Recruitment> getMainRecruitment() {
+        return findRecruitmentPort.getMainRecruitment();
+    }
+
+    @Override
+    public List<String> getRecruitmentImageUrls(Long id) {
+        return findRecruitmentPort.getRecruitmentImageUrls(id);
     }
 }
 

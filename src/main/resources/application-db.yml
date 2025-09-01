@@ -4,9 +4,9 @@ spring:
       on-profile: db
 
   datasource:
-    url: jdbc:mysql://ajoucm.c1q4o4c04ckx.ap-northeast-2.rds.amazonaws.com:4224/ACM
-    username: admin
-    password: ujshpQ7fBWI0i5Tc7Ffw
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:

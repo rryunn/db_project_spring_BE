@@ -42,4 +42,4 @@ bin/
 .DS_Store
 .env
 .idea/dataSources.xml
-appication-db.yml
+src/main/resources/application-db.yml
