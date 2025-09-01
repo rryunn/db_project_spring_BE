@@ -1,13 +1,8 @@
 package com.acm.server.application.club.service;
 
 import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.acm.server.adapter.in.dto.FindClubDto;
-import com.acm.server.adapter.in.response.Response;
-import com.acm.server.adapter.out.entity.ClubEntity;
 import com.acm.server.application.club.port.in.FindClubUseCase;
 import com.acm.server.application.club.port.out.FindClubPort;
 import com.acm.server.domain.AcademicClub;

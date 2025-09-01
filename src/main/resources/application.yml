@@ -1,6 +1,12 @@
 spring:
   profiles:
     active: db
+  
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
 
 # Swagger(OpenAPI) springdoc 설정
 springdoc:
@@ -12,11 +18,21 @@ springdoc:
 #구글 로그인
 google:
   oauth:
-    user-info-url: https://www.googleapis.com/oauth2/v2/userinfo
+    client-ids:
+      - 67500785353-oq4u26r3uek1s7b569sfr52sjkvj7j36.apps.googleusercontent.com
 
 #aws
 aws:
   s3: #이미지 저장소
     bucket: my-bucket-name
     region: ap-northeast-2
+
+#JWT
+jwt:
+  issuer: acm-server
+  secret: "PLEASE_CHANGE_THIS_TO_A_LONG_RANDOM_SECRET_KEY_32+CHARS"
+  access-token-validity-seconds: 900        # 15분
+  refresh-token-validity-seconds: 1209600   # 14일
+
+
 
