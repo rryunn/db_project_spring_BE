@@ -9,3 +9,12 @@ services:
       - .env
     environment:
       - SPRING_PROFILES_ACTIVE=db
+    depends_on:
+          - redis
+    restart: always   # 다운되면 자동 재시작
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"   # 필요 없으면 로컬로만 쓰고 주석 처리 가능
+    restart: always

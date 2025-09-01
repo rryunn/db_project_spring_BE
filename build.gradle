@@ -50,6 +50,22 @@ dependencies {
 
     // S3
     implementation 'com.amazonaws:aws-java-sdk-s3:1.12.743'
+
+    // Redis (RT 저장/재사용 감지)
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // JWT (jjwt 0.11.x)
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+    // OpenAPI (Swagger) – 운영은 제한 권장
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
+
+    // 구글 ID 토큰(RS256) 검증: Nimbus JOSE/JWT
+    implementation 'com.nimbusds:nimbus-jose-jwt:9.37.3'
+    // (선택) JWK 유틸
+    implementation 'com.nimbusds:oauth2-oidc-sdk:10.14'
 }
 
 test {

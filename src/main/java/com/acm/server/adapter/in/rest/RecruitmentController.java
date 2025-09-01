@@ -2,7 +2,6 @@ package com.acm.server.adapter.in.rest;
 
 import com.acm.server.adapter.in.response.Response;
 import com.acm.server.application.recruitment.port.in.FindRecruitmentUseCase;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
