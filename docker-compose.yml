@@ -9,6 +9,7 @@ services:
       - .env
     environment:
       - SPRING_PROFILES_ACTIVE=db
+      - GOOGLE_OAUTH_CLIENT_IDS=67500785353-oq4u26r3uek1s7b569sfr52sjkvj7j36.apps.googleusercontent.com
     depends_on:
           - redis
     restart: always   # 다운되면 자동 재시작
