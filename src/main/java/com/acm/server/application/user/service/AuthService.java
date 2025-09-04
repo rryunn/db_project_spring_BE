@@ -2,8 +2,6 @@ package com.acm.server.application.user.service;
 
 import com.acm.server.adapter.in.security.GoogleIdTokenVerifierService;
 import com.acm.server.adapter.in.security.TokenProvider;
-import com.acm.server.adapter.out.external.redis.RefreshTokenStore;
-import com.acm.server.adapter.out.persistence.user.JpaUserRepository;
 import com.acm.server.application.user.dto.TokenResponse;
 import com.acm.server.application.user.port.in.GoogleLoginUseCase;
 import com.acm.server.application.user.port.out.RefreshTokenPort;
@@ -13,7 +11,6 @@ import com.acm.server.domain.User;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
@@ -23,11 +20,11 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class AuthService{
+public class AuthService implements GoogleLoginUseCase{
     private final GoogleIdTokenVerifierService googleVerifier;
     private final TokenProvider tokenProvider;
     private final RefreshTokenPort rtPort;
-    private final UserRepositoryPort userRepo;   // ← 포트로 교체
+    private final UserRepositoryPort userRepo;
     @Value("${jwt.refresh-token-validity-seconds}") long refreshTtl;
 
     @Transactional
@@ -86,7 +83,7 @@ public class AuthService{
 
     private ResponseCookie buildRtCookie(String rt) {
         return ResponseCookie.from("RT", rt)
-                .httpOnly(true).secure(true).sameSite("None")
+                .httpOnly(true).secure(false).sameSite("Lax")
                 .path("/api/auth").maxAge(refreshTtl).build();
     }
 }

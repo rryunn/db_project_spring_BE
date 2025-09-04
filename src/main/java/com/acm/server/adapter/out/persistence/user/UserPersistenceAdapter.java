@@ -1,7 +1,7 @@
 package com.acm.server.adapter.out.persistence.user;
 
 import com.acm.server.adapter.out.entity.UserEntity;
-import com.acm.server.application.auth.port.out.LoginUserPort;
+import com.acm.server.application.user.port.out.LoadUserPort;
 import com.acm.server.application.user.port.out.UserRepositoryPort;
 import com.acm.server.domain.User;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class UserPersistenceAdapter implements UserRepositoryPort {
+public class UserPersistenceAdapter implements UserRepositoryPort, LoadUserPort {
 
     private final JpaUserRepository jpa; // Spring Data JPA (UserEntity)
 
@@ -39,6 +39,9 @@ public class UserPersistenceAdapter implements UserRepositoryPort {
         var saved = jpa.save(toEntity(user));
         return toDomain(saved);
     }
-
+    @Override
+    public Optional<User> loadById(Long userId) {
+        return jpa.findById(userId).map(this::toDomain);
+    }
     
 }

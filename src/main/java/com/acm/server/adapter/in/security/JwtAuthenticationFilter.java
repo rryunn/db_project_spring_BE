@@ -1,57 +1,51 @@
+// adapter/in/security/JwtAuthenticationFilter.java
 package com.acm.server.adapter.in.security;
 
+import com.acm.server.adapter.in.security.TokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
+import jakarta.servlet.http.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.*;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 
 import java.io.IOException;
 
-/**
- * 매 요청마다 실행되는 JWT 인증 필터.
- * 1) Authorization 헤더에서 Bearer <AT> 추출
- * 2) AT 유효/만료 검증
- * 3) sub(userId)로 UserDetails 조회 → SecurityContext에 인증 설정
- * 실패 시 인증 미설정 상태로 다음 필터로 진행(최종 401은 EntryPoint가 처리)
- */
 @Component
-@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final TokenProvider tokenProvider;
-    private final UserDetailsService userDetailsService; // adapter.out.persistence 에서 구현/주입
+
+    public JwtAuthenticationFilter(TokenProvider tokenProvider) {
+        this.tokenProvider = tokenProvider;
+    }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
-            throws ServletException, IOException {
-
-        String header = req.getHeader(HttpHeaders.AUTHORIZATION);
-
-        if (header != null && header.startsWith("Bearer ")) {
-            String token = header.substring(7);
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain chain) throws ServletException, IOException {
+        String auth = request.getHeader("Authorization");
+        if (auth != null && auth.startsWith("Bearer ")) {
+            String token = auth.substring(7);
             try {
                 if (!tokenProvider.isExpired(token)) {
-                    String userId = tokenProvider.getUserId(token);
-                    UserDetails user = userDetailsService.loadUserByUsername(userId);
+                    Long userId = Long.valueOf(tokenProvider.getUserId(token));
+                    var authorities = tokenProvider.getRoles(token).stream()
+                            .map(SimpleGrantedAuthority::new)
+                            .toList();
 
-                    var auth = new UsernamePasswordAuthenticationToken(
-                        user, null, user.getAuthorities());
-                    auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
-                    SecurityContextHolder.getContext().setAuthentication(auth);
+                    var principal = new JwtUserPrincipal(userId, tokenProvider.getEmail(token), authorities);
+                    var authentication = new UsernamePasswordAuthenticationToken(principal, null, authorities);
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             } catch (Exception ignore) {
-                // 파싱 실패/서명 오류/만료/블랙리스트 등 → 인증 미설정
+                // 유효하지 않으면 인증 미설정으로 진행
             }
         }
-
-        chain.doFilter(req, res);
+        chain.doFilter(request, response);
     }
 }
