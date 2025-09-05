@@ -107,4 +107,10 @@ public class RecruitmentPersistenceAdapter implements FindRecruitmentPort, Creat
                 .toList();
     }
 
+    @Override
+    public Optional<Recruitment> findRecruitmentById(Long recruitmentId) {
+        return jpaRecruitmentRepository.findById(recruitmentId)
+        .map(this::mapToDomain);
+    }
+
 }

@@ -3,6 +3,8 @@ package com.acm.server.adapter.in.rest;
 import org.springframework.web.bind.annotation.*;
 import com.acm.server.adapter.in.response.Response;
 import com.acm.server.application.club.port.in.FindClubUseCase;
+import com.acm.server.application.clubimage.port.in.FindClubActivityImagesUseCase;
+
 import lombok.RequiredArgsConstructor;
 
 // Swagger / springdoc
@@ -24,6 +26,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 public class ClubController {
 
     private final FindClubUseCase findClubUseCase;
+    private final FindClubActivityImagesUseCase findClubActivityImagesUseCase;
 
     @Operation(summary = "전체 동아리 목록", description = "모든 동아리(중앙/소학회 포함)를 반환합니다.")
     @ApiResponses({
@@ -119,6 +122,23 @@ public class ClubController {
             @RequestParam(required = false) String department) {
 
         var data = findClubUseCase.findFilterClub(type, category, isRecruiting, department);
+        return new Response(200, "success", data);
+    }
+
+    @Operation(
+    summary = "클럽 활동사진 조회",
+    description = "clubId로 해당 클럽의 활동사진 리스트를 반환합니다."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "조회 성공"),
+        @ApiResponse(responseCode = "404", description = "해당 클럽 없음", content = @Content)
+    })
+    @GetMapping("/{clubId}/activity-images")
+    public Response getClubActivityImages(
+            @Parameter(description = "클럽 ID", example = "1")
+            @PathVariable Long clubId) {
+
+        var data = findClubActivityImagesUseCase.findByClubId(clubId);
         return new Response(200, "success", data);
     }
 }

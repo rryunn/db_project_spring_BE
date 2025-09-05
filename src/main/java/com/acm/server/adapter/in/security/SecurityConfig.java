@@ -49,6 +49,7 @@ public class SecurityConfig {
                 .requestMatchers("/actuator/health").permitAll()
                 .requestMatchers("/api/auth/google", "/api/auth/refresh", "/api/auth/logout").permitAll()
                 .requestMatchers("/api/club/**").permitAll()
+                .requestMatchers("/api/recruitments/**").permitAll()
                 .requestMatchers("/api/user/me").authenticated()
                 // Swagger는 운영에서 막거나 ADMIN 제한 권장
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**","/api-docs/**").permitAll()

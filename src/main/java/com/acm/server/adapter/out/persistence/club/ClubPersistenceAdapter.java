@@ -1,10 +1,10 @@
 package com.acm.server.adapter.out.persistence.club;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
-import com.acm.server.adapter.in.response.Response;
 import com.acm.server.adapter.out.entity.AcademicClubEntity;
 import com.acm.server.adapter.out.entity.CentralClubEntity;
 import com.acm.server.adapter.out.entity.ClubEntity;
@@ -17,35 +17,70 @@ import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
-public class ClubPersistenceAdapter implements FindClubPort{
+public class ClubPersistenceAdapter implements FindClubPort {
+
     private final JpaClubRepository jpaClubRepository;
     private final JpaAcademicClubRepository jpaAcademicClubRepository;
     private final JpaCentralClubRepository jpaCentralClubRepository;
 
-    public List<Club> findAllClub(){
-        List<ClubEntity> clubEntities = jpaClubRepository.findAll();
-
-        return clubEntities.stream()
-        .map(entity -> Club.builder()
-                .id(entity.getId())
-                .name(entity.getName())
-                .clubType(entity.getType().toString())
-                .logoUrl(entity.getLogoUrl())
-                .isRecruiting(entity.isRecruiting())
-                .category(entity.getCategory().toString())
-                .build()
-        )
-        .toList();
+    @Override
+    public List<Club> findAllClub() {
+        return jpaClubRepository.findAll()
+                .stream()
+                .map(this::toClub)
+                .toList();
     }
 
-    public CentralClub findCentralClub(Long clubId){
-        Object row = jpaCentralClubRepository.findCentralClubById(clubId)
-            .orElseThrow(() -> new RuntimeException("해당 클럽 없음"));
+    @Override
+    public Optional<CentralClub> findCentralClub(Long clubId) {
+        // findCentralClubById가 Optional<Object> (Object[] join row) 라는 전제
+        return jpaCentralClubRepository.findCentralClubById(clubId)
+                .map(row -> {
+                    Object[] arr = (Object[]) row;         // (ClubEntity, CentralClubEntity)
+                    ClubEntity c = (ClubEntity) arr[0];
+                    CentralClubEntity d = (CentralClubEntity) arr[1];
+                    return toCentralClub(c, d);
+                });
+    }
 
-        Object[] arr = (Object[]) row;
-        ClubEntity c = (ClubEntity) arr[0];
-        CentralClubEntity d = (CentralClubEntity) arr[1];
+    @Override
+    public Optional<AcademicClub> findAcademicClub(Long clubId) {
+        return jpaAcademicClubRepository.findAcademicClubById(clubId)
+                .map(row -> {
+                    Object[] arr = (Object[]) row;         // (ClubEntity, AcademicClubEntity)
+                    ClubEntity c = (ClubEntity) arr[0];
+                    AcademicClubEntity d = (AcademicClubEntity) arr[1];
+                    return toAcademicClub(c, d);
+                });
+    }
 
+    @Override
+    public Optional<Club> findClub(Long clubId) {
+        return jpaClubRepository.findById(clubId)
+                .map(this::toClub);
+    }
+
+    @Override
+    public List<Club> findFilterClub(String type, String category, Boolean isRecruiting, String department) {
+        return jpaClubRepository.findFilterClub(type, category, isRecruiting, department)
+                .stream()
+                .map(this::toClub)
+                .toList();
+    }
+
+    // ========= Mappers =========
+    private Club toClub(ClubEntity e) {
+        return Club.builder()
+                .id(e.getId())
+                .name(e.getName())
+                .clubType(e.getType().toString())
+                .logoUrl(e.getLogoUrl())
+                .isRecruiting(e.isRecruiting())
+                .category(e.getCategory().toString())
+                .build();
+    }
+
+    private CentralClub toCentralClub(ClubEntity c, CentralClubEntity d) {
         return CentralClub.builder()
                 .id(c.getId())
                 .name(c.getName())
@@ -64,19 +99,11 @@ public class ClubPersistenceAdapter implements FindClubPort{
                 .logoUrl(c.getLogoUrl())
                 .isRecruiting(c.isRecruiting())
                 .category(c.getCategory().toString())
-                .details(d.getDetails().name())  // Enum → String
+                .details(d.getDetails().name())
                 .build();
     }
 
-    public AcademicClub findAcademicClub(Long clubId){
-        Object row = jpaAcademicClubRepository.findAcademicClubById(clubId)
-            .orElseThrow(() -> new RuntimeException("해당 클럽 없음"));
-
-        Object[] arr = (Object[]) row;
-        ClubEntity c = (ClubEntity) arr[0];
-        AcademicClubEntity d = (AcademicClubEntity) arr[1];
-
-        // ✅ Builder 패턴 사용
+    private AcademicClub toAcademicClub(ClubEntity c, AcademicClubEntity d) {
         return AcademicClub.builder()
                 .id(c.getId())
                 .name(c.getName())
@@ -99,19 +126,5 @@ public class ClubPersistenceAdapter implements FindClubPort{
                 .departmentName(d.getDepartmentName())
                 .build();
     }
-    public List<Club> findFilterClub(String type, String category,Boolean isRecruiting, String department){
-        List<ClubEntity> clubEntities = jpaClubRepository.findFilterClub(type, category, isRecruiting, department);
-
-        return clubEntities.stream()
-        .map(entity -> Club.builder()
-                .id(entity.getId())
-                .name(entity.getName())
-                .clubType(entity.getType().toString())
-                .logoUrl(entity.getLogoUrl())
-                .isRecruiting(entity.isRecruiting())
-                .category(entity.getCategory().toString())
-                .build()
-        )
-        .toList();
-    }
 }
+

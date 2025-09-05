@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import com.acm.server.application.club.port.in.FindClubUseCase;
 import com.acm.server.application.club.port.out.FindClubPort;
+import com.acm.server.common.exception.ResourceNotFoundException;
 import com.acm.server.domain.AcademicClub;
 import com.acm.server.domain.CentralClub;
 import com.acm.server.domain.Club;
@@ -24,12 +25,14 @@ public class FindClubService implements FindClubUseCase{
 
     @Override
     public CentralClub findCentralClub(Long clubId) {
-        return findClubPort.findCentralClub(clubId);
+       return findClubPort.findCentralClub(clubId)
+            .orElseThrow(() -> new ResourceNotFoundException("Central club not found: " + clubId));
     }
 
     @Override
     public AcademicClub findAcademicClub(Long clubId) {
-        return findClubPort.findAcademicClub(clubId);
+        return findClubPort.findAcademicClub(clubId)
+            .orElseThrow(() -> new ResourceNotFoundException("Central club not found: " + clubId));
     }
 
     @Override

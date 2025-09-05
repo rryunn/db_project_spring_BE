@@ -34,5 +34,7 @@ jwt:
   access-token-validity-seconds: 900        # 15분
   refresh-token-validity-seconds: 1209600   # 14일
 
+encryption:
+  aes-key: z0e4X3V5a3H7w4oYz+PQh0qTcsZaV+GwJyfQOoXepzQ=
 
 

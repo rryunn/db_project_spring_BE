@@ -19,14 +19,18 @@ public class UserEntity {
     private Long id;
 
     @Column(name = "user_name", unique = true)
+    @Convert(converter = SimpleCryptoConverter.class)
     private String name;
 
     @Column(name="user_email", unique =true)
+    @Convert(converter = SimpleCryptoConverter.class)
     private String email;
 
     @Column(name = "profile_picture")
+    @Convert(converter = SimpleCryptoConverter.class)
     private String profilePic;
 
     @Column(name="google_id", unique =true)
+    @Convert(converter = SimpleCryptoConverter.class)
     private String googleId;
 }
