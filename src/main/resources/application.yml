@@ -23,18 +23,21 @@ google:
 
 #aws
 aws:
-  s3: #이미지 저장소
-    bucket: my-bucket-name
-    region: ap-northeast-2
+  accessKey: ${AWS_ACCESS_KEY_ID}
+  secretKey: ${AWS_SECRET_ACCESS_KEY}
+
+s3:
+  bucket: ${S3_BUCKET_NAME}
+  region: ${AWS_REGION}
 
 #JWT
 jwt:
   issuer: acm-server
-  secret: "PLEASE_CHANGE_THIS_TO_A_LONG_RANDOM_SECRET_KEY_32+CHARS"
+  secret: ${JWT_SECRET}
   access-token-validity-seconds: 900        # 15분
   refresh-token-validity-seconds: 1209600   # 14일
 
 encryption:
-  aes-key: z0e4X3V5a3H7w4oYz+PQh0qTcsZaV+GwJyfQOoXepzQ=
+  aes-key: ${ENCRYPTION_AES_KEY}
 
 

@@ -3,6 +3,7 @@ package com.acm.server.adapter.out.persistence.club;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -39,4 +40,8 @@ public interface JpaClubRepository extends JpaRepository<ClubEntity, Long> {
         @Param("isRecruiting") Boolean isRecruiting,
         @Param("department") String department
     );
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update ClubEntity c set c.logoUrl = :logoUrl, c.updatedAt = CURRENT_TIMESTAMP where c.id = :clubId")
+    int updateLogoUrl(@Param("clubId") Long clubId, @Param("logoUrl") String logoUrl);
 }

@@ -8,16 +8,20 @@ import org.springframework.stereotype.Repository;
 import com.acm.server.adapter.out.entity.AcademicClubEntity;
 import com.acm.server.adapter.out.entity.CentralClubEntity;
 import com.acm.server.adapter.out.entity.ClubEntity;
+import com.acm.server.application.club.dto.UpdateClubReq;
 import com.acm.server.application.club.port.out.FindClubPort;
+import com.acm.server.application.club.port.out.UpdateClubLogoPort;
+import com.acm.server.application.club.port.out.UpdateClubPort;
 import com.acm.server.domain.AcademicClub;
 import com.acm.server.domain.CentralClub;
 import com.acm.server.domain.Club;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
-public class ClubPersistenceAdapter implements FindClubPort {
+public class ClubPersistenceAdapter implements FindClubPort, UpdateClubPort, UpdateClubLogoPort  {
 
     private final JpaClubRepository jpaClubRepository;
     private final JpaAcademicClubRepository jpaAcademicClubRepository;
@@ -66,6 +70,27 @@ public class ClubPersistenceAdapter implements FindClubPort {
                 .stream()
                 .map(this::toClub)
                 .toList();
+    }
+
+    @Override
+    public Club updateClubById(Long clubId, UpdateClubReq req) {
+        ClubEntity e = jpaClubRepository.findById(clubId)
+                .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Club not found"));
+
+        // ✅ 상위 category / name / recruiting / type 등은 절대 변경하지 않음
+        if (req.getDescription() != null)     e.setDescription(req.getDescription());
+        if (req.getMainActivities() != null)  e.setMainActivities(req.getMainActivities());
+        if (req.getLocation() != null)        e.setLocation(req.getLocation());
+        if (req.getInstagramUrl() != null)            e.setSns1(req.getInstagramUrl());
+        if (req.getYoutubeUrl() != null)            e.setSns2(req.getYoutubeUrl());
+        if (req.getLinktreeUrl() != null)            e.setSns3(req.getLinktreeUrl());
+        if (req.getClubUrl() != null)            e.setSns4(req.getClubUrl());
+
+        // Dirty Checking으로 @PreUpdate(updatedAt) 동작
+        ClubEntity saved = jpaClubRepository.save(e);
+
+        // 수정 결과를 클라이언트에 돌려줄 도메인으로 변환 (상세 매핑)
+        return toClubDetail(saved);
     }
 
     // ========= Mappers =========
@@ -126,5 +151,32 @@ public class ClubPersistenceAdapter implements FindClubPort {
                 .departmentName(d.getDepartmentName())
                 .build();
     }
+
+    private Club toClubDetail(ClubEntity e) {
+        return Club.builder()
+                .id(e.getId())
+                .name(e.getName())
+                .description(e.getDescription())
+                .location(e.getLocation())
+                .getMainActivities(e.getMainActivities()) // 도메인 필드명이 단수형이라 주의
+                .clubType(e.getType().toString())
+                .logoUrl(e.getLogoUrl())
+                .category(e.getCategory().toString())
+                .instagramUrl(e.getSns1())
+                .youtubeUrl(e.getSns2())
+                .linktreeUrl(e.getSns3())
+                .clubUrl(e.getSns4())
+                .isRecruiting(e.isRecruiting())
+                .build();
+    }
+
+
+    /** logo_url 컬럼만 부분 업데이트 */
+    @Transactional
+    @Override
+    public void updateClubLogo(Long clubId, String logoUrl) {
+        jpaClubRepository.updateLogoUrl(clubId, logoUrl);
+    }
+
 }
 

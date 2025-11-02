@@ -33,11 +33,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
                 if (!tokenProvider.isExpired(token)) {
                     Long userId = Long.valueOf(tokenProvider.getUserId(token));
+
                     var authorities = tokenProvider.getRoles(token).stream()
                             .map(SimpleGrantedAuthority::new)
                             .toList();
 
-                    var principal = new JwtUserPrincipal(userId, tokenProvider.getEmail(token), authorities);
+                    var managedClubs = tokenProvider.getManagedClubs(token); // ★ 추가
+
+                    var principal = new JwtUserPrincipal(
+                            userId,
+                            tokenProvider.getEmail(token),
+                            authorities,
+                            managedClubs
+                    );
+
                     var authentication = new UsernamePasswordAuthenticationToken(principal, null, authorities);
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authentication);

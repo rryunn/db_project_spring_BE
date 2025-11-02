@@ -6,6 +6,8 @@ import com.acm.server.application.user.dto.TokenResponse;
 import com.acm.server.application.user.port.in.GoogleLoginUseCase;
 import com.acm.server.application.user.port.out.RefreshTokenPort;
 import com.acm.server.application.user.port.out.UserRepositoryPort;
+import com.acm.server.application.user.port.out.MemberRepositoryPort;
+
 import com.acm.server.domain.User;
 
 import jakarta.transaction.Transactional;
@@ -25,6 +27,7 @@ public class AuthService implements GoogleLoginUseCase{
     private final TokenProvider tokenProvider;
     private final RefreshTokenPort rtPort;
     private final UserRepositoryPort userRepo;
+    private final MemberRepositoryPort memberRepo;
     @Value("${jwt.refresh-token-validity-seconds}") long refreshTtl;
 
     @Transactional
@@ -38,11 +41,12 @@ public class AuthService implements GoogleLoginUseCase{
                 .orElseGet(() -> User.createFromGoogle(info.getSub(), info.getEmail(), info.getName(), info.getPicture()));
 
         user = userRepo.save(user); // 도메인 저장
+        List<Long> managedClubs = memberRepo.findOperatorClubIdsByUserId(user.getId());
 
         String userId = String.valueOf(user.getId());
         String sid = UUID.randomUUID().toString();
 
-        String at = tokenProvider.createAccessToken(userId, user.rolesAsStrings());
+        String at = tokenProvider.createAccessToken(userId, user.rolesAsStrings(), managedClubs);
         String rt = tokenProvider.createRefreshToken(userId, sid);
         rtPort.save(userId, sid, rt, Duration.ofSeconds(refreshTtl));
 
@@ -64,9 +68,12 @@ public class AuthService implements GoogleLoginUseCase{
         String newRt = tokenProvider.createRefreshToken(userId, newSid);
         rtPort.save(userId, newSid, newRt, Duration.ofSeconds(refreshTtl));
 
+        Long userIdLong = Long.parseLong(userId);
+        List<Long> managedClubs = memberRepo.findOperatorClubIdsByUserId(userIdLong);
+
         var roles = userRepo.findById(Long.parseLong(userId))
                 .map(User::rolesAsStrings).orElse(List.of("ROLE_USER"));
-        String at = tokenProvider.createAccessToken(userId, roles);
+        String at = tokenProvider.createAccessToken(userId, roles, managedClubs);
 
         return new TokenResponse(at, buildRtCookie(newRt).toString());
     }

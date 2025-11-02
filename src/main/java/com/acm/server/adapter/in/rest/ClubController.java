@@ -1,9 +1,22 @@
 package com.acm.server.adapter.in.rest;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
 import com.acm.server.adapter.in.response.Response;
+import com.acm.server.adapter.in.security.JwtUserPrincipal;
+import com.acm.server.application.club.dto.UpdateClubReq;
 import com.acm.server.application.club.port.in.FindClubUseCase;
 import com.acm.server.application.clubimage.port.in.FindClubActivityImagesUseCase;
+import com.acm.server.application.club.port.in.UpdateClubUseCase;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+
+import com.acm.server.application.club.port.in.UpdateClubLogoUseCase;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.MediaType;
+import java.time.ZoneId;
+import java.util.Map;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,6 +40,8 @@ public class ClubController {
 
     private final FindClubUseCase findClubUseCase;
     private final FindClubActivityImagesUseCase findClubActivityImagesUseCase;
+    private final UpdateClubUseCase updateClubUseCase;
+    private final UpdateClubLogoUseCase updateClubLogoUseCase;
 
     @Operation(summary = "전체 동아리 목록", description = "모든 동아리(중앙/소학회 포함)를 반환합니다.")
     @ApiResponses({
@@ -139,6 +154,79 @@ public class ClubController {
             @PathVariable Long clubId) {
 
         var data = findClubActivityImagesUseCase.findByClubId(clubId);
+        return new Response(200, "success", data);
+    }
+
+    @Operation(
+        summary = "클럽 정보 부분 수정",
+        description = """
+            관리 권한이 있는 클럽의 일부 정보(description, mainActivities, location, sns1~4)만 수정할 수 있습니다.
+            상위 category, 이름, 모집 여부 등은 수정 불가합니다.
+
+            ✅ 예시 요청 바디:
+            ```json
+            {
+            "description": "새로운 클럽 소개입니다.",
+            "mainActivities": "정기공연, 대동제 참가",
+            "location": "학생회관 3층 밴드실",
+            "instagramUrl": "https://instagram.com/rockers_ajou",
+            "youtubeUrl": "https://youtube.com/@rockersband",
+            "linktreeUrl": "https://linktr.ee/rockers",
+            "clubUrl": "https://rockers.ajou.ac.kr"
+            }
+            ```
+        """
+    )
+    @PatchMapping("/{clubId}")
+    public Response patchClub(
+            @PathVariable Long clubId,
+            @AuthenticationPrincipal JwtUserPrincipal principal,
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "수정할 필드만 포함하면 됩니다 (null 또는 누락된 필드는 유지됩니다).",
+                    required = true,
+                    content = @io.swagger.v3.oas.annotations.media.Content(
+                            schema = @io.swagger.v3.oas.annotations.media.Schema(implementation = UpdateClubReq.class)
+                    )
+            )
+            @RequestBody UpdateClubReq req
+    ) {
+        if (principal.managedClubs() == null || !principal.managedClubs().contains(clubId)) {
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "권한이 없습니다.");
+        }
+        var data = updateClubUseCase.updateClub(clubId, req);
+        return new Response(200, "success", data);
+    }
+
+
+
+    @Operation(
+        summary = "클럽 로고 업로드/교체 (파일명 매번 변경)",
+        description = "관리 권한이 있는 사용자가 클럽 로고 이미지를 업로드합니다. 업로드가 성공하면 이전 로고 파일을 삭제하고 DB의 logoUrl을 새 URL로 교체합니다."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "업로드 성공"),
+        @ApiResponse(responseCode = "400", description = "잘못된 파일", content = @Content),
+        @ApiResponse(responseCode = "403", description = "권한 없음", content = @Content),
+        @ApiResponse(responseCode = "500", description = "서버 오류", content = @Content)
+    })
+    @SecurityRequirement(name = "BearerAuth")
+    @PutMapping(value = "/{clubId}/logo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Response uploadOrReplaceClubLogo(
+            @PathVariable Long clubId,
+            @AuthenticationPrincipal JwtUserPrincipal principal,
+            @RequestPart("file") MultipartFile file
+    ) {
+        // 권한 검사
+        if (principal.managedClubs() == null || !principal.managedClubs().contains(clubId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "권한이 없습니다.");
+        }
+
+        var club = updateClubLogoUseCase.updateLogo(clubId, file);
+
+        var data = Map.of(
+            "clubId", club.getId(),
+            "logoUrl", club.getLogoUrl()   // 랜덤 키이므로 캐시 파라미터 불필요
+        );
         return new Response(200, "success", data);
     }
 }
