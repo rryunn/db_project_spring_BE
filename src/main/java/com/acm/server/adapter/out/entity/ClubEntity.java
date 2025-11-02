@@ -3,6 +3,7 @@ package com.acm.server.adapter.out.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "clubs")
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
