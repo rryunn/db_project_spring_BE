@@ -53,7 +53,7 @@ public class S3StorageAdapter implements FileStoragePort {
     public String clubActivityKey(Long clubId, @Nullable String originalFilename) {
         String ext = ext(originalFilename);
         String uuid = UUID.randomUUID().toString();
-        return "clubactivity/%d/%s%s".formatted(clubId, uuid, ext);
+        return "clubActivityImages/%d/%s%s".formatted(clubId, uuid, ext);
     }
 
     @Override

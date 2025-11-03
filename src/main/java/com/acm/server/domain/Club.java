@@ -12,7 +12,7 @@ public class Club {
     private String name;
     private String description;
     private String location;
-    private String getMainActivities;
+    private String MainActivities;
     private String clubType;
     private String logoUrl;
     private String category;

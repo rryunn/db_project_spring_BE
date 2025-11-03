@@ -158,7 +158,7 @@ public class ClubPersistenceAdapter implements FindClubPort, UpdateClubPort, Upd
                 .name(e.getName())
                 .description(e.getDescription())
                 .location(e.getLocation())
-                .getMainActivities(e.getMainActivities()) // 도메인 필드명이 단수형이라 주의
+                .MainActivities(e.getMainActivities()) // 도메인 필드명이 단수형이라 주의
                 .clubType(e.getType().toString())
                 .logoUrl(e.getLogoUrl())
                 .category(e.getCategory().toString())

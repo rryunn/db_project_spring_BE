@@ -8,6 +8,7 @@ import com.acm.server.adapter.in.response.Response;
 import com.acm.server.adapter.in.security.JwtUserPrincipal;
 import com.acm.server.application.club.dto.UpdateClubReq;
 import com.acm.server.application.club.port.in.FindClubUseCase;
+import com.acm.server.application.club.port.in.ManageClubActivityImagesUseCase;
 import com.acm.server.application.clubimage.port.in.FindClubActivityImagesUseCase;
 import com.acm.server.application.club.port.in.UpdateClubUseCase;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -42,7 +43,8 @@ public class ClubController {
     private final FindClubActivityImagesUseCase findClubActivityImagesUseCase;
     private final UpdateClubUseCase updateClubUseCase;
     private final UpdateClubLogoUseCase updateClubLogoUseCase;
-
+    private final ManageClubActivityImagesUseCase manageClubActivityImagesUseCase;
+    
     @Operation(summary = "전체 동아리 목록", description = "모든 동아리(중앙/소학회 포함)를 반환합니다.")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "조회 성공"),
@@ -141,23 +143,6 @@ public class ClubController {
     }
 
     @Operation(
-    summary = "클럽 활동사진 조회",
-    description = "clubId로 해당 클럽의 활동사진 리스트를 반환합니다."
-    )
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "조회 성공"),
-        @ApiResponse(responseCode = "404", description = "해당 클럽 없음", content = @Content)
-    })
-    @GetMapping("/{clubId}/activity-images")
-    public Response getClubActivityImages(
-            @Parameter(description = "클럽 ID", example = "1")
-            @PathVariable Long clubId) {
-
-        var data = findClubActivityImagesUseCase.findByClubId(clubId);
-        return new Response(200, "success", data);
-    }
-
-    @Operation(
         summary = "클럽 정보 부분 수정",
         description = """
             관리 권한이 있는 클럽의 일부 정보(description, mainActivities, location, sns1~4)만 수정할 수 있습니다.
@@ -200,7 +185,7 @@ public class ClubController {
 
 
     @Operation(
-        summary = "클럽 로고 업로드/교체 (파일명 매번 변경)",
+        summary = "클럽 로고 업로드/교체",
         description = "관리 권한이 있는 사용자가 클럽 로고 이미지를 업로드합니다. 업로드가 성공하면 이전 로고 파일을 삭제하고 DB의 logoUrl을 새 URL로 교체합니다."
     )
     @ApiResponses({
@@ -225,8 +210,117 @@ public class ClubController {
 
         var data = Map.of(
             "clubId", club.getId(),
-            "logoUrl", club.getLogoUrl()   // 랜덤 키이므로 캐시 파라미터 불필요
+            "logoUrl", club.getLogoUrl()
         );
         return new Response(200, "success", data);
     }
+
+    ///////////////////////////////클럽 활동사진///////////////////////////////////////////////////////
+
+    @Operation(
+    summary = "클럽 활동사진 조회",
+    description = "clubId로 해당 클럽의 활동사진 리스트를 반환합니다."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "조회 성공"),
+        @ApiResponse(responseCode = "404", description = "해당 클럽 없음", content = @Content)
+    })
+    @GetMapping("/{clubId}/activity-images")
+    public Response getClubActivityImages(
+            @Parameter(description = "클럽 ID", example = "1")
+            @PathVariable Long clubId) {
+
+        var data = findClubActivityImagesUseCase.findByClubId(clubId);
+        return new Response(200, "success", data);
+    }
+
+    @Operation(
+        summary = "클럽 활동사진 업로드(여러 장 가능)",
+        description = "처음 업로드든 추가 업로드든 모두 이 엔드포인트를 사용합니다. 업로드 순서 = 노출 순서(PK 오름차순)."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "업로드 성공"),
+        @ApiResponse(responseCode = "400", description = "잘못된 파일", content = @Content),
+        @ApiResponse(responseCode = "403", description = "권한 없음", content = @Content)
+    })
+    @PostMapping(value = "/{clubId}/activity-images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Response uploadClubActivityImages(
+            @PathVariable Long clubId,
+            @AuthenticationPrincipal JwtUserPrincipal principal,
+            @RequestPart("files") java.util.List<MultipartFile> files
+    ) {
+        if (principal.managedClubs() == null || !principal.managedClubs().contains(clubId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "권한이 없습니다.");
+        }
+        var data = manageClubActivityImagesUseCase.upload(clubId, files); // 반환: [{id, url}, ...]
+        return new Response(200, "success", data);
+    }
+
+
+    @Operation(
+        summary = "클럽 활동사진 교체(한 장)",
+        description = "oldUrl에 해당하는 사진 1장을 새 파일로 교체합니다. 순서는 유지됩니다."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "교체 성공"),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청", content = @Content),
+        @ApiResponse(responseCode = "403", description = "권한 없음", content = @Content),
+        @ApiResponse(responseCode = "404", description = "해당 이미지 없음", content = @Content)
+    })
+    @PutMapping(value = "/{clubId}/activity-images/by-url", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Response replaceClubActivityImageByUrl(
+            @PathVariable Long clubId,
+            @AuthenticationPrincipal JwtUserPrincipal principal,
+            @RequestParam("oldUrl") String oldUrl,
+            @RequestPart("file") MultipartFile file
+    ) {
+        if (principal.managedClubs() == null || !principal.managedClubs().contains(clubId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "권한이 없습니다.");
+        }
+        var data = manageClubActivityImagesUseCase.replaceByUrl(clubId, oldUrl, file); // 반환: {id, url}
+        return new Response(200, "success", data);
+    }
+
+    @Operation(
+        summary = "클럽 활동사진 삭제(한 장)",
+        description = "url로 지정된 사진 1장을 삭제합니다."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "삭제 성공"),
+        @ApiResponse(responseCode = "403", description = "권한 없음", content = @Content),
+        @ApiResponse(responseCode = "404", description = "해당 이미지 없음", content = @Content)
+    })
+    @DeleteMapping("/{clubId}/activity-images/one")
+    public Response deleteOneClubActivityImage(
+            @PathVariable Long clubId,
+            @AuthenticationPrincipal JwtUserPrincipal principal,
+            @RequestParam("url") String url
+    ) {
+        if (principal.managedClubs() == null || !principal.managedClubs().contains(clubId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "권한이 없습니다.");
+        }
+        manageClubActivityImagesUseCase.deleteOneByUrl(clubId, url);
+        return new Response(200, "success", Map.of("deleted", true));
+    }
+
+    @Operation(
+        summary = "클럽 활동사진 전부 삭제",
+        description = "해당 클럽의 모든 활동사진을 삭제합니다."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "전체 삭제 성공"),
+        @ApiResponse(responseCode = "403", description = "권한 없음", content = @Content)
+    })
+    @DeleteMapping("/{clubId}/activity-images/all")
+    public Response deleteAllClubActivityImages(
+            @PathVariable Long clubId,
+            @AuthenticationPrincipal JwtUserPrincipal principal
+    ) {
+        if (principal.managedClubs() == null || !principal.managedClubs().contains(clubId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "권한이 없습니다.");
+        }
+        manageClubActivityImagesUseCase.deleteAll(clubId);
+        return new Response(200, "success", Map.of("deletedAll", true));
+    }
+
 }
