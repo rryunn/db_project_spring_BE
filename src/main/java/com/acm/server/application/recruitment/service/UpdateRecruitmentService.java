@@ -1,6 +1,7 @@
 package com.acm.server.application.recruitment.service;
 
 import com.acm.server.application.recruitment.port.in.RecruitmentCommand;
+import com.acm.server.application.recruitment.port.in.UpdateRecruitmentCommand;
 import com.acm.server.application.recruitment.port.in.UpdateRecruitmentUseCase;
 import com.acm.server.application.recruitment.port.out.UpdateRecruitmentPort;
 import com.acm.server.domain.Recruitment;
@@ -17,27 +18,44 @@ public class UpdateRecruitmentService implements UpdateRecruitmentUseCase {
 
     @Override
     @Transactional
-    public Recruitment updateRecruitment(RecruitmentCommand cmd) {
+    public Recruitment updateRecruitment(UpdateRecruitmentCommand cmd) {
         // 1) 존재 확인
         var current = updatePort.findRecruitmentByClubId(cmd.clubId())
                 .orElseThrow(() -> new IllegalArgumentException("Recruitment not found for clubId=" + cmd.clubId()));
 
-        // 2) 기존 createdAt은 유지, 나머지 필드 갱신
         var now = LocalDateTime.now();
         var toSave = Recruitment.builder()
-                .id(current.getId())                 // ← 기존 ID 유지
-                .clubId(current.getClubId())         // ← clubId 고정
-                .clubName(current.getClubName())     // (도메인에 있으면 유지/또는 null)
-                .title(cmd.title())
-                .description(cmd.description())
-                .type(cmd.type())
-                .phoneNumber(cmd.phoneNumber())
-                .email(cmd.email())
-                .startDate(cmd.startDate())
-                .endDate(cmd.endDate())
-                .url(cmd.url())
-                .createdAt(current.getCreatedAt())   // ← 유지
-                .updatedAt(now)                      // ← 갱신
+                .id(current.getId())
+                .clubId(current.getClubId())
+                .clubName(current.getClubName())
+                .createdAt(current.getCreatedAt())
+                .updatedAt(now) // 업데이트 시간만 갱신
+
+                // --- PATCH 로직 시작 ---
+                .title(
+                        cmd.title() != null ? cmd.title() : current.getTitle()
+                )
+                .description(
+                        cmd.description() != null ? cmd.description() : current.getDescription()
+                )
+                .type(
+                        cmd.type() != null ? cmd.type() : current.getType()
+                )
+                .phoneNumber(
+                        cmd.phoneNumber() != null ? cmd.phoneNumber() : current.getPhoneNumber()
+                )
+                .email(
+                        cmd.email() != null ? cmd.email() : current.getEmail()
+                )
+                .startDate(
+                        cmd.startDate() != null ? cmd.startDate() : current.getStartDate()
+                )
+                .endDate(
+                        cmd.endDate() != null ? cmd.endDate() : current.getEndDate()
+                )
+                .url(
+                        cmd.url() != null ? cmd.url() : current.getUrl()
+                )
                 .build();
 
         return updatePort.save(toSave);
