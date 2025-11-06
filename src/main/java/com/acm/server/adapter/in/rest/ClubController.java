@@ -21,7 +21,6 @@ import java.util.Map;
 
 import lombok.RequiredArgsConstructor;
 
-// Swagger / springdoc
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -45,6 +44,8 @@ public class ClubController {
     private final UpdateClubLogoUseCase updateClubLogoUseCase;
     private final ManageClubActivityImagesUseCase manageClubActivityImagesUseCase;
     
+    /*===============================동아리 조회 컨트롤러========================================= */
+    // 전체
     @Operation(summary = "전체 동아리 목록", description = "모든 동아리(중앙/소학회 포함)를 반환합니다.")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "조회 성공"),
@@ -57,6 +58,7 @@ public class ClubController {
         return new Response(200, "success", data);
     }
 
+    //중앙동아리 상세
     @Operation(summary = "중앙동아리 상세", description = "clubId로 중앙동아리 상세 정보를 조회합니다.")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "조회 성공"),
@@ -70,6 +72,7 @@ public class ClubController {
         return new Response(200, "success", data);
     }
 
+    //소학회 상세
     @Operation(summary = "소학회 상세", description = "clubId로 소학회 상세 정보를 조회합니다.")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "조회 성공"),
@@ -83,6 +86,7 @@ public class ClubController {
         return new Response(200, "success", data);
     }
 
+    //필터
     @Operation(
         summary = "동아리 필터 검색",
         description = """
@@ -142,6 +146,9 @@ public class ClubController {
         return new Response(200, "success", data);
     }
 
+
+    /*===============================관리자기능========================================= */
+    // jwt 파싱해서 manage club인 경우에만
     @Operation(
         summary = "클럽 정보 부분 수정",
         description = """
@@ -182,8 +189,7 @@ public class ClubController {
         return new Response(200, "success", data);
     }
 
-
-
+    //로고 업데이트
     @Operation(
         summary = "클럽 로고 업로드/교체",
         description = "관리 권한이 있는 사용자가 클럽 로고 이미지를 업로드합니다. 업로드가 성공하면 이전 로고 파일을 삭제하고 DB의 logoUrl을 새 URL로 교체합니다."
