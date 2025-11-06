@@ -14,6 +14,7 @@ public class UserController {
 
     private final FindUserUseCase findUserUseCase;
 
+    // access token decode해서 안에 있는 user_id로 수행, 따로 user_id 받지않음
     /** GET /api/users/me */
     @GetMapping("/me")
     public MyInfoResponse getMyInfo(@AuthenticationPrincipal JwtUserPrincipal principal) {

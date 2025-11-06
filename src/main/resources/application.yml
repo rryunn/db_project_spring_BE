@@ -1,3 +1,6 @@
+server:
+  forward-headers-strategy: framework   # ★ 루트 레벨
+
 spring:
   profiles:
     active: db
@@ -6,7 +9,6 @@ spring:
     redis:
       host: redis
       port: 6379
-
 
 # Swagger(OpenAPI) springdoc 설정
 springdoc:

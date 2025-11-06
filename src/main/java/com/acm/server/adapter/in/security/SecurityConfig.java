@@ -79,12 +79,7 @@ public class SecurityConfig {
         CorsConfiguration cfg = new CorsConfiguration();
         cfg.setAllowCredentials(true);
         // TODO: 운영 시 반드시 실제 프런트 도메인만 허용
-        cfg.setAllowedOriginPatterns(List.of(
-            "https://*.your-domain.com",
-            "https://your-gh-pages.github.io",
-            "http://localhost:5173",          // 로컬 개발용(예시)
-            "http://localhost:3000"
-        ));
+        cfg.setAllowedOriginPatterns(List.of("*"));
         cfg.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS"));
         cfg.setAllowedHeaders(List.of(HttpHeaders.AUTHORIZATION, HttpHeaders.CONTENT_TYPE));
         cfg.setExposedHeaders(List.of(HttpHeaders.AUTHORIZATION));
