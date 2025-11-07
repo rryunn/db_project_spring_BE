@@ -20,8 +20,8 @@ public class UpdateRecruitmentService implements UpdateRecruitmentUseCase {
     @Transactional
     public Recruitment updateRecruitment(UpdateRecruitmentCommand cmd) {
         // 1) 존재 확인
-        var current = updatePort.findRecruitmentByClubId(cmd.clubId())
-                .orElseThrow(() -> new IllegalArgumentException("Recruitment not found for clubId=" + cmd.clubId()));
+        var current = updatePort.findRecruitmentById(cmd.recruitmentId())
+                .orElseThrow(() -> new IllegalArgumentException("Recruitment not found for Id=" + cmd.recruitmentId()));
 
         var now = LocalDateTime.now();
         var toSave = Recruitment.builder()

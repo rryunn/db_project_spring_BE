@@ -9,8 +9,9 @@ import java.util.Optional;
 public interface FindRecruitmentUseCase {
 
     List<Recruitment> findAllRecruitment();
-    Optional<Recruitment> findRecruitmentByClubId(Long clubId);
-    void deleteRecruitmentById(Long clubId);
+    List<Recruitment> findRecruitmentsByClubId(Long clubId);
+    Optional<Recruitment> findRecruitmentById(Long recruitmentId);
+    void deleteRecruitmentById(Long recruitmentId);
     List<Recruitment> getMainRecruitment();
     List<String> getRecruitmentImageUrls(Long id);
 }
