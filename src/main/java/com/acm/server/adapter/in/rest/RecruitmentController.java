@@ -41,10 +41,21 @@ public class RecruitmentController {
         var data = findRecruitmentUseCase.findAllRecruitment(); // 그냥 domain 반환
         return new Response(200, "success", data);
     }
-
+    @Operation(summary = "클럽 ID로 모집공고 목록 조회", description = "특정 clubId에 속한 모든 모집공고 목록을 반환합니다.")
     @GetMapping("/{clubId}")
-    public Response getRecruitmentByClubId(@PathVariable Long clubId) {
-        var data = findRecruitmentUseCase.findRecruitmentByClubId(clubId);
+    public Response getRecruitmentsByClubId(@PathVariable Long clubId) {
+        var data = findRecruitmentUseCase.findRecruitmentsByClubId(clubId);
+        return new Response(200, "success", data);
+    }
+    @Operation(summary = "모집공고 ID로 모집공고 상세 조회")
+    @GetMapping("/{recruitmentId}")
+    public Response getRecruitmentById(@PathVariable Long recruitmentId) {
+        var data = findRecruitmentUseCase.findRecruitmentById(recruitmentId)
+                    .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "조회하려는 모집공고가 존재하지 않습니다. 모집공고 아이디: " + recruitmentId
+                ));
+
         return new Response(200, "success", data);
     }
     @GetMapping("/main")
@@ -52,12 +63,6 @@ public class RecruitmentController {
         var data = findRecruitmentUseCase.getMainRecruitment();
         return new Response(200, "success", data);
     }
-//    @GetMapping("/{id}/images")
-//    @Operation(summary = "모집공고 이미지 조회", description = "모집공고 id를 이용해 해당 공고에 등록된 이미지 URL 리스트를 조회합니다.")
-//    public ResponseEntity<List<String>> getRecruitmentImages(@PathVariable Long id) {
-//        List<String> imageUrls = findRecruitmentUseCase.getRecruitmentImageUrls(id);
-//        return ResponseEntity.ok(imageUrls);
-//    }
     @Operation(
             summary = "모집공고 삭제",
             description = "특정 클럽(clubId)의 모집공고를 삭제합니다. \n\n" +
@@ -70,12 +75,16 @@ public class RecruitmentController {
             @ApiResponse(responseCode = "500", description = "서버 오류", content = @Content)
     })
     @SecurityRequirement(name = "BearerAuth")
-    @DeleteMapping("/{clubId}")
-    public void deleteRecruitmentById(@PathVariable Long clubId, @AuthenticationPrincipal JwtUserPrincipal principal) {
+    @DeleteMapping("/{recruitmentId}")
+    public void deleteRecruitmentById(@PathVariable Long recruitmentId, @AuthenticationPrincipal JwtUserPrincipal principal) {
+        var recruitment = findRecruitmentUseCase.findRecruitmentById(recruitmentId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "모집공고를 찾을 수 없습니다."));
+
+        Long clubId = recruitment.getClubId();
         if (principal.managedClubs() == null || !principal.managedClubs().contains(clubId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "권한이 없습니다.");
         }
-        findRecruitmentUseCase.deleteRecruitmentById(clubId);
+        findRecruitmentUseCase.deleteRecruitmentById(recruitmentId);
     }
 
     @Operation(
@@ -116,12 +125,17 @@ public class RecruitmentController {
             @ApiResponse(responseCode = "500", description = "서버 오류", content = @Content)
     })
     @SecurityRequirement(name = "BearerAuth")
-    @PatchMapping("/{clubId}")
-    public Response updateRecruitment(@PathVariable Long clubId, @RequestBody @Valid UpdateRecruitmentReq req,@AuthenticationPrincipal JwtUserPrincipal principal) {
+    @PatchMapping("/{recruitmentId}")
+    public Response updateRecruitment(@PathVariable Long recruitmentId, @RequestBody @Valid UpdateRecruitmentReq req,@AuthenticationPrincipal JwtUserPrincipal principal) {
+        var recruitment = findRecruitmentUseCase.findRecruitmentById(recruitmentId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "모집공고를 찾을 수 없습니다."));
+
+        Long clubId = recruitment.getClubId(); // 공고에서 clubId 추출
+
         if (principal.managedClubs() == null || !principal.managedClubs().contains(clubId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "권한이 없습니다.");
         }
-        var updated = updateRecruitmentUseCase.updateRecruitment(req.toCommand(clubId));
+        var updated = updateRecruitmentUseCase.updateRecruitment(req.toCommand(recruitmentId));
         return new Response(200, "success", updated);
     }
     @GetMapping("/{id}/images")
