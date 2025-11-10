@@ -4,7 +4,8 @@ import com.acm.server.adapter.out.entity.RecruitmentType;
 import java.time.LocalDate;
 
 public record UpdateRecruitmentCommand(
-        Long clubId, // 어떤 클럽의 공고를 수정할지 식별
+        Long recruitmentId,
+        Long clubId,
         String title,
         String description,
         RecruitmentType type,

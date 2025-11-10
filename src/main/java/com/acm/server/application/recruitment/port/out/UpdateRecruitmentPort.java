@@ -7,8 +7,7 @@ import java.util.Optional;
 
 public interface UpdateRecruitmentPort {
 
-    // clubId로 현재 모집공고 로딩(존재 검증용)
-    Optional<Recruitment> findRecruitmentByClubId(Long clubId);
+    Optional<Recruitment> findRecruitmentById(Long recruitmentId);
 
     // 저장(업데이트)
     Recruitment save(Recruitment recruitment);

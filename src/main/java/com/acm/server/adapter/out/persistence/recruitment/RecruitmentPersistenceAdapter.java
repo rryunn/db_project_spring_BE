@@ -34,28 +34,18 @@ public class RecruitmentPersistenceAdapter implements FindRecruitmentPort, Creat
                 .toList();
     }
 
-    @Override
-    public Optional<Recruitment> findRecruitmentByClubId(Long clubId){
-        return jpaRecruitmentRepository.findByClubId(clubId)
-                .map(this::mapToDomain);
-    }
 
     @Override
     public List<Recruitment> getMainRecruitment() {
-        Pageable limit = PageRequest.of(0, 60);
-        LocalDate today = LocalDate.now();
-
-        List<RecruitmentEntity> entities = jpaRecruitmentRepository
-                .findByEndDateAfterOrderByEndDateAsc(today, limit);
-
-        return entities.stream()
+        return jpaRecruitmentRepository.findMainRecruitments()
+                .stream()
                 .map(this::mapToDomain)
                 .toList();
     }
 
     @Transactional
-    public void deleteRecruitmentById(Long clubId) {
-        jpaRecruitmentRepository.deleteByClub_Id(clubId);
+    public void deleteRecruitmentById(Long recruitmentId) {
+        jpaRecruitmentRepository.deleteById(recruitmentId);
     }
 
     @Override
@@ -83,6 +73,13 @@ public class RecruitmentPersistenceAdapter implements FindRecruitmentPort, Creat
         return mapToDomain(saved);
     }
 
+    @Override
+    public List<Recruitment> findRecruitmentsByClubId(Long clubId){
+        return jpaRecruitmentRepository.findByClub_Id(clubId)
+                .stream()
+                .map(this::mapToDomain)
+                .toList();
+    }
     private Recruitment mapToDomain(RecruitmentEntity entity) {
         return Recruitment.builder()
                 .id(entity.getId())

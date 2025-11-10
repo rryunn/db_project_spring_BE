@@ -27,9 +27,10 @@ public class UpdateRecruitmentReq {
 
     private String url;
     // DTO를 Command 객체로 변환
-    public UpdateRecruitmentCommand toCommand(Long clubId) {
+    public UpdateRecruitmentCommand toCommand(Long recruitmentId) {
         return new UpdateRecruitmentCommand(
-                clubId,
+                recruitmentId,
+                null,
                 this.title,
                 this.description,
                 this.type,
