@@ -42,7 +42,7 @@ public class RecruitmentController {
         return new Response(200, "success", data);
     }
     @Operation(summary = "클럽 ID로 모집공고 목록 조회", description = "특정 clubId에 속한 모든 모집공고 목록을 반환합니다.")
-    @GetMapping("/{clubId}")
+    @GetMapping("/club/{clubId}")
     public Response getRecruitmentsByClubId(@PathVariable Long clubId) {
         var data = findRecruitmentUseCase.findRecruitmentsByClubId(clubId);
         return new Response(200, "success", data);
