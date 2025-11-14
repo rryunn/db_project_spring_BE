@@ -1,9 +1,10 @@
-package com.acm.server.application.club.service;
+package com.acm.server.application.clubimage.service;
 
 import com.acm.server.application.club.port.out.FileStoragePort;
 import com.acm.server.application.club.port.out.FindClubPort;
-import com.acm.server.application.club.port.out.ManageClubActivityImagesPort; // DB Port (네가 준 인터페이스)
-import com.acm.server.application.club.port.in.ManageClubActivityImagesUseCase; // 유즈케이스 Port In
+import com.acm.server.application.clubimage.port.in.ManageClubActivityImagesUseCase;
+import com.acm.server.application.clubimage.port.out.ClubActivityImageRedisPort;
+import com.acm.server.application.clubimage.port.out.ManageClubActivityImagesPort;
 import com.acm.server.domain.ClubActivityImage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ public class ManageClubActivityImagesService implements ManageClubActivityImages
     private final FindClubPort findClubPort;                       // club 존재 검증용
     private final ManageClubActivityImagesPort imageDbPort;        // DB Port (out)
     private final FileStoragePort fileStoragePort;                 // 파일 스토리지 Port (out)
+    private final ClubActivityImageRedisPort redisPort;
 
     @Override
     public List<ClubActivityImage> upload(Long clubId, List<MultipartFile> files) {
@@ -47,6 +49,7 @@ public class ManageClubActivityImagesService implements ManageClubActivityImages
                         .imageUrl(uploaded.url()) // 키 미보관 정책
                         .build();
                 saved.add(imageDbPort.save(domain));
+                redisPort.evictImages(clubId);
             } catch (Exception e) {
                 throw new RuntimeException("Failed to upload club activity image", e);
             }
@@ -86,6 +89,7 @@ public class ManageClubActivityImagesService implements ManageClubActivityImages
                     .build();
 
             var saved = imageDbPort.save(newDomain);
+            redisPort.evictImages(clubId);
 
             // ⚠️ 키 미보관 정책: 스토리지의 이전 파일 삭제는 수행하지 않음.
             return saved;
@@ -103,6 +107,7 @@ public class ManageClubActivityImagesService implements ManageClubActivityImages
                 .orElseThrow(() -> new IllegalArgumentException("image not found for this club/url"));
 
         imageDbPort.deleteByClubIdAndUrl(clubId, url);
+        redisPort.evictImages(clubId);
 
         // ⚠️ 키 미보관 정책: 스토리지의 파일 삭제는 수행하지 않음.
     }
@@ -113,6 +118,7 @@ public class ManageClubActivityImagesService implements ManageClubActivityImages
         if (all.isEmpty()) return;
 
         imageDbPort.deleteAllByClubId(clubId);
+        redisPort.evictImages(clubId);
 
         // ⚠️ 키 미보관 정책: 스토리지 일괄 삭제는 수행하지 않음.
     }

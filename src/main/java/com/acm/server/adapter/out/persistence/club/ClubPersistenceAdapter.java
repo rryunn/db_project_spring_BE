@@ -112,21 +112,22 @@ public class ClubPersistenceAdapter implements FindClubPort, UpdateClubPort, Upd
                 .description(c.getDescription())
                 .mainActivities(c.getMainActivities())
                 .location(c.getLocation())
-                .contactPhoneNumber(c.getContactPhoneNumber())
                 .instagramUrl(c.getSns1())
                 .youtubeUrl(c.getSns2())
                 .linktreeUrl(c.getSns3())
                 .clubUrl(c.getSns4())
-                .contactEmail(c.getContactEmail())
                 .createdAt(c.getCreatedAt())
                 .updatedAt(c.getUpdatedAt())
                 .clubType(c.getType().toString())
                 .logoUrl(c.getLogoUrl())
                 .isRecruiting(c.isRecruiting())
                 .category(c.getCategory().toString())
+
+                // 중앙동아리 전용
                 .details(d.getDetails().name())
                 .build();
     }
+
 
     private AcademicClub toAcademicClub(ClubEntity c, AcademicClubEntity d) {
         return AcademicClub.builder()
@@ -135,12 +136,10 @@ public class ClubPersistenceAdapter implements FindClubPort, UpdateClubPort, Upd
                 .description(c.getDescription())
                 .mainActivities(c.getMainActivities())
                 .location(c.getLocation())
-                .contactPhoneNumber(c.getContactPhoneNumber())
                 .instagramUrl(c.getSns1())
                 .youtubeUrl(c.getSns2())
                 .linktreeUrl(c.getSns3())
                 .clubUrl(c.getSns4())
-                .contactEmail(c.getContactEmail())
                 .createdAt(c.getCreatedAt())
                 .updatedAt(c.getUpdatedAt())
                 .clubType(c.getType().toString())
@@ -158,17 +157,20 @@ public class ClubPersistenceAdapter implements FindClubPort, UpdateClubPort, Upd
                 .name(e.getName())
                 .description(e.getDescription())
                 .location(e.getLocation())
-                .MainActivities(e.getMainActivities()) // 도메인 필드명이 단수형이라 주의
-                .clubType(e.getType().toString())
-                .logoUrl(e.getLogoUrl())
-                .category(e.getCategory().toString())
+                .mainActivities(e.getMainActivities())
                 .instagramUrl(e.getSns1())
                 .youtubeUrl(e.getSns2())
                 .linktreeUrl(e.getSns3())
                 .clubUrl(e.getSns4())
+                .createdAt(e.getCreatedAt())
+                .updatedAt(e.getUpdatedAt())
+                .clubType(e.getType().toString())
+                .logoUrl(e.getLogoUrl())
                 .isRecruiting(e.isRecruiting())
+                .category(e.getCategory().toString())
                 .build();
     }
+
 
 
     /** logo_url 컬럼만 부분 업데이트 */

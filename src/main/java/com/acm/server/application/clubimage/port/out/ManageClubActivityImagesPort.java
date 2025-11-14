@@ -1,4 +1,4 @@
-package com.acm.server.application.club.port.out;
+package com.acm.server.application.clubimage.port.out;
 import com.acm.server.domain.ClubActivityImage;
 
 import java.util.List;

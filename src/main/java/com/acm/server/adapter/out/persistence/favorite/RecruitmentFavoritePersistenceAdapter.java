@@ -28,23 +28,33 @@ public class RecruitmentFavoritePersistenceAdapter
     private final JpaRecruitmentRepository recruitmentRepo;
     private final JpaRecruitmentImageRepository imageRepo;
 
-    @Override
-    public void saveFavorite(Long userId, Long recruitmentId) {
-        UserEntity userRef = userRepo.getReferenceById(userId);                  // SELECT 없이 프록시
+@Override
+    public boolean saveFavorite(Long userId, Long recruitmentId) {
+        RecruitmentFavoriteId id = new RecruitmentFavoriteId(userId, recruitmentId);
+
+        // 이미 있으면 아무 것도 안 하고 false 리턴
+        if (favoriteRepo.existsById(id)) {
+            return false;
+        }
+
+        UserEntity userRef = userRepo.getReferenceById(userId);
         RecruitmentEntity recRef = recruitmentRepo.getReferenceById(recruitmentId);
 
         var entity = RecruitmentFavoriteEntity.builder()
-                .id(new RecruitmentFavoriteId(userId, recruitmentId))
+                .id(id)
                 .user(userRef)
                 .recruitment(recRef)
                 .build();
 
         favoriteRepo.save(entity);
+        return true; // 실제로 하나 추가됨
     }
 
     @Override
-    public void deleteFavorite(Long userId, Long recruitmentId) {
-        favoriteRepo.deleteById(new RecruitmentFavoriteId(userId, recruitmentId));
+    public boolean deleteFavorite(Long userId, Long recruitmentId) {
+        // deleteBy…()가 삭제된 row 수를 반환하게 하기
+        long deleted = favoriteRepo.deleteByUser_IdAndId_RecruitmentId(userId, recruitmentId);
+        return deleted > 0;
     }
 
     @Override

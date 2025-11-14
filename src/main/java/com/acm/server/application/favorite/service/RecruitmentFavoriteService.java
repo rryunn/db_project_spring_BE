@@ -5,10 +5,12 @@ import com.acm.server.application.favorite.port.out.DeleteRecruitmentFavoritePor
 import com.acm.server.application.favorite.port.out.LoadRecruitmentFavoritesPort;
 import com.acm.server.application.favorite.port.out.SaveRecruitmentFavoritePort;
 import com.acm.server.application.recruitment.port.out.FindRecruitmentPort;
+import com.acm.server.application.recruitment.port.out.RecruitmentCountRedisPort;
 import com.acm.server.common.exception.ResourceNotFoundException;
 import com.acm.server.application.favorite.RecruitmentFavoriteView;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -20,19 +22,22 @@ public class RecruitmentFavoriteService implements RecruitmentFavoriteUseCase {
     private final DeleteRecruitmentFavoritePort deletePort;
     private final LoadRecruitmentFavoritesPort loadPort;
     private final FindRecruitmentPort findRecruitmentPort;
+    private final RecruitmentCountRedisPort counterCachePort;
 
     @Override
+    @Transactional
     public void addFavorite(Long userId, Long recruitmentId) {
         findRecruitmentPort.findRecruitmentById(recruitmentId)
             .orElseThrow(() -> new ResourceNotFoundException("Recruitment not found: " + recruitmentId));
-        savePort.saveFavorite(userId, recruitmentId);
+        if(savePort.saveFavorite(userId, recruitmentId)){ counterCachePort.incrementSave(recruitmentId, 1L); };
     }
 
     @Override
+    @Transactional
     public void removeFavorite(Long userId, Long recruitmentId) {
         findRecruitmentPort.findRecruitmentById(recruitmentId)
             .orElseThrow(() -> new ResourceNotFoundException("Recruitment not found: " + recruitmentId));
-        deletePort.deleteFavorite(userId, recruitmentId);
+        if(deletePort.deleteFavorite(userId, recruitmentId)){counterCachePort.incrementSave(recruitmentId, -1L);}
     }
 
     @Override

@@ -26,7 +26,7 @@ import java.util.Set;
  */
 @Component
 @RequiredArgsConstructor
-public class RefreshTokenStore implements RefreshTokenPort{
+public class RefreshTokenRedis implements RefreshTokenPort{
 
     private final StringRedisTemplate redis;
 

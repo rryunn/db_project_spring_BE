@@ -1,6 +1,8 @@
 package com.acm.server.adapter.out.persistence.recruitment;
 //db 모집공고 테이블이랑 entity를 연결해주는 인터페이스
 import com.acm.server.adapter.out.entity.RecruitmentEntity;
+import com.acm.server.application.recruitment.dto.RecruitmentCounterProjection;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,4 +19,12 @@ public interface JpaRecruitmentRepository extends JpaRepository<RecruitmentEntit
             "WHERE r.type = '상시모집' OR " +
             "(r.type = '수시모집' AND r.endDate >= CURRENT_DATE)")
     List<RecruitmentEntity> findMainRecruitments();
+
+    @Query("""
+        select r.id as id,
+               r.viewCount as viewCount,
+               r.saveCount as saveCount
+        from RecruitmentEntity r
+        """)
+    List<RecruitmentCounterProjection> findAllForCounterInit();
 }

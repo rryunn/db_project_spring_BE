@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.acm.server.application.club.port.in.UpdateClubLogoUseCase;
 import com.acm.server.application.club.port.out.FindClubPort;
+import com.acm.server.application.club.port.out.ClubRedisPort;
 import com.acm.server.application.club.port.out.FileStoragePort;
 import com.acm.server.application.club.port.out.UpdateClubLogoPort;
 import com.acm.server.common.exception.ResourceNotFoundException;
@@ -23,6 +24,7 @@ public class ClubLogoService implements UpdateClubLogoUseCase {
     private final FindClubPort findClubPort;             // 도메인 조회
     private final FileStoragePort fileStoragePort;       // S3 업/삭
     private final UpdateClubLogoPort updateClubLogoPort; // DB logoUrl만 갱신
+    private final ClubRedisPort clubRedisPort;
 
     @Transactional
     @Override
@@ -47,6 +49,8 @@ public class ClubLogoService implements UpdateClubLogoUseCase {
             // 4) 업로드 성공했으니 이전 파일 삭제(있다면)
             deleteOldIfExists(oldUrl);
 
+            // 5) 캐시 삭제
+            evictCaches(club);
             return club;
         } catch (IOException e) {
             throw new RuntimeException("S3 upload failed", e);
@@ -73,4 +77,19 @@ public class ClubLogoService implements UpdateClubLogoUseCase {
         if (f.getContentType() == null || !f.getContentType().startsWith("image/"))
             throw new IllegalArgumentException("이미지 파일만 업로드 가능");
     }
+
+    private void evictCaches(Club club) {
+        // 1) 전체 목록 캐시 제거
+        clubRedisPort.evictAllClubs();
+
+        // 2) 개별 상세 캐시 제거 (타입 기반)
+        switch (club.getClubType()) {
+            case "중앙동아리" -> clubRedisPort.evictCentralClub(club.getId());
+            case "소학회" -> clubRedisPort.evictAcademicClub(club.getId());
+            default -> { /* 혹시 또 다른 타입 생길 때 대비 */ }
+        }
+    }
 }
+
+
+
