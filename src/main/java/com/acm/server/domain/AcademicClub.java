@@ -1,31 +1,17 @@
 package com.acm.server.domain;
 
-import java.time.LocalDateTime;
-
-import lombok.Builder;
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 @Getter
-@Builder
-public class AcademicClub {
-    private Long id;
-    private String name;
-    private String description;
-    private String mainActivities;
-    private String location;
-    private String contactPhoneNumber;
-    private String instagramUrl;
-    private String youtubeUrl;
-    private String linktreeUrl;
-    private String clubUrl;
-    private String contactEmail;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private String clubType;
-    private String logoUrl;
-    private String category;
-    private boolean isRecruiting;
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+public class AcademicClub extends Club {
 
+    // 학술동아리 전용 필드
     private String recruitmentScope;
     private String departmentName;
 }

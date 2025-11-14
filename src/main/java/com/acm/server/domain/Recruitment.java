@@ -3,28 +3,34 @@ package com.acm.server.domain;
 import com.acm.server.adapter.out.entity.RecruitmentType;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
-@Builder
+@Builder(toBuilder = true)
 public class Recruitment {
-    private final Long id;
-    private final Long clubId;
-    private final String clubName;
+    private Long id;
+    private Long clubId;
+    private String clubName;
 
-    private final String title;
-    private final String description;
-    private final RecruitmentType type;
+    private String title;
+    private String description;
+    private RecruitmentType type;
 
-    private final String phoneNumber;
-    private final String email;
+    private String phoneNumber;
+    private String email;
 
-    private final LocalDate startDate;
-    private final LocalDate endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
 
-    private final String url;
-    private final LocalDateTime createdAt;
-    private final LocalDateTime updatedAt;
+    private String url;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    private Long viewCount;
+    private Long saveCount; 
+
+    private String semester;
 }

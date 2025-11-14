@@ -1,4 +1,5 @@
 package com.acm.server.application.recruitment.port.out;
+import com.acm.server.application.recruitment.dto.RecruitmentCounterProjection;
 import com.acm.server.domain.Recruitment;
 
 import java.util.List;
@@ -11,4 +12,7 @@ public interface FindRecruitmentPort {
     List<Recruitment> getMainRecruitment();
     List<String> getRecruitmentImageUrls(Long id);
     List<Recruitment> findRecruitmentsByClubId(Long clubId);
+
+    //캐싱용도
+    List<RecruitmentCounterProjection> findAllForCounterInit();
 }

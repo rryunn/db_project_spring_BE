@@ -1,4 +1,4 @@
-package com.acm.server.application.club.port.in;
+package com.acm.server.application.clubimage.port.in;
 
 import com.acm.server.domain.ClubActivityImage;
 import org.springframework.web.multipart.MultipartFile;

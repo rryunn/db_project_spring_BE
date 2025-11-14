@@ -6,12 +6,14 @@ import java.time.LocalDateTime;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 
 @Entity
 @Table(name = "recruitments")
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -56,6 +58,15 @@ public class RecruitmentEntity {
 
     @Column(name="application_url")
     private String url;
+
+    @Column(name="view_count")
+    private Long viewCount;
+
+    @Column(name="save_count")
+    private Long saveCount;
+
+    @Column(name="semester")
+    private String semester;
 }
 
 

@@ -3,6 +3,7 @@ package com.acm.server.adapter.out.persistence.recruitment;
 import com.acm.server.adapter.out.entity.RecruitmentEntity;
 import com.acm.server.domain.RecruitmentImage;
 import com.acm.server.adapter.out.persistence.club.JpaClubRepository;
+import com.acm.server.application.recruitment.dto.RecruitmentCounterProjection;
 import com.acm.server.application.recruitment.port.out.CreateRecruitmentPort;
 import com.acm.server.application.recruitment.port.out.FindRecruitmentPort;
 import com.acm.server.application.recruitment.port.out.ManageRecruitmentImagesPort;
@@ -161,6 +162,12 @@ public class RecruitmentPersistenceAdapter implements FindRecruitmentPort, Creat
         recruitmentImageRepository.deleteByRecruitment_Id(recruitmentId);
     }
 
+    //캐싱용도
+    @Override
+    public List<RecruitmentCounterProjection> findAllForCounterInit() {
+        return jpaRecruitmentRepository.findAllForCounterInit();
+    }
+
     /**
      * (신규) RecruitmentImage 엔티티 -> 도메인 매퍼
      */
@@ -171,4 +178,5 @@ public class RecruitmentPersistenceAdapter implements FindRecruitmentPort, Creat
                 .imageUrl(entity.getImageUrl())
                 .build();
     }
+
 }

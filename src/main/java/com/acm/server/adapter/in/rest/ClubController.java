@@ -8,8 +8,8 @@ import com.acm.server.adapter.in.response.Response;
 import com.acm.server.adapter.in.security.JwtUserPrincipal;
 import com.acm.server.application.club.dto.UpdateClubReq;
 import com.acm.server.application.club.port.in.FindClubUseCase;
-import com.acm.server.application.club.port.in.ManageClubActivityImagesUseCase;
 import com.acm.server.application.clubimage.port.in.FindClubActivityImagesUseCase;
+import com.acm.server.application.clubimage.port.in.ManageClubActivityImagesUseCase;
 import com.acm.server.application.club.port.in.UpdateClubUseCase;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 

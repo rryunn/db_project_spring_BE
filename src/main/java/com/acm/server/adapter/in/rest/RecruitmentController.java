@@ -41,16 +41,18 @@ public class RecruitmentController {
         var data = findRecruitmentUseCase.findAllRecruitment(); // 그냥 domain 반환
         return new Response(200, "success", data);
     }
+
     @Operation(summary = "클럽 ID로 모집공고 목록 조회", description = "특정 clubId에 속한 모든 모집공고 목록을 반환합니다.")
     @GetMapping("/{clubId}")
     public Response getRecruitmentsByClubId(@PathVariable Long clubId) {
         var data = findRecruitmentUseCase.findRecruitmentsByClubId(clubId);
         return new Response(200, "success", data);
     }
+
     @Operation(summary = "모집공고 ID로 모집공고 상세 조회")
     @GetMapping("/{recruitmentId}")
-    public Response getRecruitmentById(@PathVariable Long recruitmentId) {
-        var data = findRecruitmentUseCase.findRecruitmentById(recruitmentId)
+    public Response getRecruitmentById(@PathVariable Long recruitmentId, @AuthenticationPrincipal JwtUserPrincipal principal) {
+        var data = findRecruitmentUseCase.findRecruitmentByIdWithView(recruitmentId, principal.userId())
                     .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
                         "조회하려는 모집공고가 존재하지 않습니다. 모집공고 아이디: " + recruitmentId
@@ -58,11 +60,13 @@ public class RecruitmentController {
 
         return new Response(200, "success", data);
     }
+
     @GetMapping("/main")
     public Response getMainRecruitment() {
         var data = findRecruitmentUseCase.getMainRecruitment();
         return new Response(200, "success", data);
     }
+    
     @Operation(
             summary = "모집공고 삭제",
             description = "특정 클럽(clubId)의 모집공고를 삭제합니다. \n\n" +
