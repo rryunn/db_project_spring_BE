@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 /**
- * ✅ 인증 관련 API 컨트롤러
+ *  인증 관련 API 컨트롤러
  * - /google : 구글 id_token → 검증 후 우리 JWT 발급 (AT+RT)
  * - /refresh: RefreshToken 로테이션 후 AccessToken 재발급
  * - /logout : RefreshToken 삭제

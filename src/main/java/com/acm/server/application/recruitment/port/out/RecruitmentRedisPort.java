@@ -14,6 +14,11 @@ public interface RecruitmentRedisPort {
     Optional<List<Recruitment>> getMainRecruitments();
     void setMainRecruitments(List<Recruitment> recruitments);
 
+    // 상세 조회 캐시
+    Optional<Recruitment> getRecruitment(Long recruitmentId);
+    void setRecruitment(Long recruitmentId, Recruitment recruitment);
+    void evictRecruitment(Long recruitmentId);
+
     // 필요하면 무효화용 메서드도 추가 가능
     void evictAll();
     void evictMain();

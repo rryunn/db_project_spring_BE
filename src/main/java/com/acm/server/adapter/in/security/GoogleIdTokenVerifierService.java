@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * ✅ 구글에서 발급한 id_token 을 서버에서 직접 검증하는 서비스
+ *  구글에서 발급한 id_token 을 서버에서 직접 검증하는 서비스
  * - iss: 반드시 "https://accounts.google.com" 또는 "accounts.google.com"
  * - aud: 우리 앱의 client_id(화이트리스트)
  * - exp: 만료시간 확인
