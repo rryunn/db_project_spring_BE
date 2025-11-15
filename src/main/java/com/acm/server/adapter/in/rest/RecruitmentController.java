@@ -1,6 +1,7 @@
 package com.acm.server.adapter.in.rest;
 
 import com.acm.server.adapter.in.dto.RecruitmentRequest;
+import com.acm.server.adapter.in.dto.response.RecruitmentSummaryResponse;
 import com.acm.server.adapter.in.response.Response;
 import com.acm.server.adapter.in.security.JwtUserPrincipal;
 import com.acm.server.application.recruitment.dto.UpdateRecruitmentReq;
@@ -39,14 +40,72 @@ public class RecruitmentController {
     //================조회=======================
     @GetMapping
     public Response getRecruitments() {
-        var data = findRecruitmentUseCase.findAllRecruitment(); // 그냥 domain 반환
+        var recruitments = findRecruitmentUseCase.findAllRecruitment(); // 그냥 domain 반환
+        var data = recruitments.stream()
+                .map(r -> RecruitmentSummaryResponse.builder()
+                        .id(r.getId())
+                        .clubId(r.getClubId())
+                        .clubName(r.getClubName())
+                        .title(r.getTitle())
+                        .type(r.getType() != null ? r.getType().name() : null)
+                        .startDate(r.getStartDate())
+                        .endDate(r.getEndDate())
+                        .createdAt(r.getCreatedAt())
+                        .updatedAt(r.getUpdatedAt())
+                        .viewCount(r.getViewCount() != null ? r.getViewCount() : 0L)
+                        .saveCount(r.getSaveCount() != null ? r.getSaveCount() : 0L)
+                        .semester(r.getSemester())
+                        .build()
+                )
+                .toList();
         return new Response(200, "success", data);
     }
 
     @Operation(summary = "클럽 ID로 모집공고 목록 조회", description = "특정 clubId에 속한 모든 모집공고 목록을 반환합니다.")
     @GetMapping("/club/{clubId}")
     public Response getRecruitmentsByClubId(@PathVariable Long clubId) {
-        var data = findRecruitmentUseCase.findRecruitmentsByClubId(clubId);
+        var recruitments = findRecruitmentUseCase.findRecruitmentsByClubId(clubId);
+        var data = recruitments.stream()
+                .map(r -> RecruitmentSummaryResponse.builder()
+                        .id(r.getId())
+                        .clubId(r.getClubId())
+                        .clubName(r.getClubName())
+                        .title(r.getTitle())
+                        .type(r.getType() != null ? r.getType().name() : null)
+                        .startDate(r.getStartDate())
+                        .endDate(r.getEndDate())
+                        .createdAt(r.getCreatedAt())
+                        .updatedAt(r.getUpdatedAt())
+                        .viewCount(r.getViewCount() != null ? r.getViewCount() : 0L)
+                        .saveCount(r.getSaveCount() != null ? r.getSaveCount() : 0L)
+                        .semester(r.getSemester())
+                        .build()
+                )
+                .toList();
+        return new Response(200, "success", data);
+    }
+
+
+    @GetMapping("/main")
+    public Response getMainRecruitment() {
+        var recruitments = findRecruitmentUseCase.getMainRecruitment();
+        var data = recruitments.stream()
+                .map(r -> RecruitmentSummaryResponse.builder()
+                        .id(r.getId())
+                        .clubId(r.getClubId())
+                        .clubName(r.getClubName())
+                        .title(r.getTitle())
+                        .type(r.getType() != null ? r.getType().name() : null)
+                        .startDate(r.getStartDate())
+                        .endDate(r.getEndDate())
+                        .createdAt(r.getCreatedAt())
+                        .updatedAt(r.getUpdatedAt())
+                        .viewCount(r.getViewCount() != null ? r.getViewCount() : 0L)
+                        .saveCount(r.getSaveCount() != null ? r.getSaveCount() : 0L)
+                        .semester(r.getSemester())
+                        .build()
+                )
+                .toList();
         return new Response(200, "success", data);
     }
 
@@ -60,13 +119,6 @@ public class RecruitmentController {
                         "조회하려는 모집공고가 존재하지 않습니다. 모집공고 아이디: " + recruitmentId
                 ));
 
-        return new Response(200, "success", data);
-    }
-
-
-    @GetMapping("/main")
-    public Response getMainRecruitment() {
-        var data = findRecruitmentUseCase.getMainRecruitment();
         return new Response(200, "success", data);
     }
     

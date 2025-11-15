@@ -30,7 +30,7 @@ public class RecruitmentPersistenceAdapter implements FindRecruitmentPort, Creat
 
     @Override
     public List<Recruitment> findAllRecruitment() {
-        return jpaRecruitmentRepository.findAll().stream()
+        return jpaRecruitmentRepository.findAllWithClub().stream()
                 .map(this::mapToDomain)
                 .toList();
     }

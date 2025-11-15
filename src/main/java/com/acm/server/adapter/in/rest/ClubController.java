@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.acm.server.adapter.in.dto.response.ClubSummaryResponse;
 import com.acm.server.adapter.in.response.Response;
 import com.acm.server.adapter.in.security.JwtUserPrincipal;
 import com.acm.server.application.club.dto.UpdateClubReq;
@@ -53,7 +54,22 @@ public class ClubController {
     })
     @GetMapping("/all")
     public Response getAllClub() {
-        var data = findClubUseCase.findAllClub();
+        var clubs = findClubUseCase.findAllClub();
+  
+        var data = clubs.stream()
+                .map(c -> ClubSummaryResponse.builder()
+                    .id(c.getId())
+                    .name(c.getName())
+                    .createdAt(c.getCreatedAt())
+                    .updatedAt(c.getUpdatedAt())
+                    .clubType(c.getClubType())
+                    .logoUrl(c.getLogoUrl())
+                    .category(c.getCategory())
+                    .recruiting(c.isRecruiting())
+                    .build()
+                )
+                .toList();
+        
         return new Response(200, "success", data);
     }
 
@@ -141,7 +157,21 @@ public class ClubController {
             @RequestParam(required = false) Boolean isRecruiting,
             @RequestParam(required = false) String department) {
 
-        var data = findClubUseCase.findFilterClub(type, category, isRecruiting, department);
+        var clubs = findClubUseCase.findAllClub();
+  
+        var data = clubs.stream()
+                .map(c -> ClubSummaryResponse.builder()
+                    .id(c.getId())
+                    .name(c.getName())
+                    .createdAt(c.getCreatedAt())
+                    .updatedAt(c.getUpdatedAt())
+                    .clubType(c.getClubType())
+                    .logoUrl(c.getLogoUrl())
+                    .category(c.getCategory())
+                    .recruiting(c.isRecruiting())
+                    .build()
+                )
+                .toList();
         return new Response(200, "success", data);
     }
 

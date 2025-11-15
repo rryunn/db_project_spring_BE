@@ -102,6 +102,8 @@ public class ClubPersistenceAdapter implements FindClubPort, UpdateClubPort, Upd
                 .logoUrl(e.getLogoUrl())
                 .isRecruiting(e.isRecruiting())
                 .category(e.getCategory().toString())
+                .createdAt(e.getCreatedAt())
+                .updatedAt(e.getUpdatedAt())
                 .build();
     }
 
