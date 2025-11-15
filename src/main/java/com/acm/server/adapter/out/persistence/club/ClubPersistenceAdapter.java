@@ -77,7 +77,7 @@ public class ClubPersistenceAdapter implements FindClubPort, UpdateClubPort, Upd
         ClubEntity e = jpaClubRepository.findById(clubId)
                 .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Club not found"));
 
-        // ✅ 상위 category / name / recruiting / type 등은 절대 변경하지 않음
+        //  상위 category / name / recruiting / type 등은 절대 변경하지 않음
         if (req.getDescription() != null)     e.setDescription(req.getDescription());
         if (req.getMainActivities() != null)  e.setMainActivities(req.getMainActivities());
         if (req.getLocation() != null)        e.setLocation(req.getLocation());

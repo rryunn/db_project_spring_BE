@@ -3,6 +3,7 @@ package com.acm.server.application.recruitment.service;
 import com.acm.server.application.recruitment.port.in.RecruitmentCommand;
 import com.acm.server.application.recruitment.port.in.UpdateRecruitmentCommand;
 import com.acm.server.application.recruitment.port.in.UpdateRecruitmentUseCase;
+import com.acm.server.application.recruitment.port.out.RecruitmentRedisPort;
 import com.acm.server.application.recruitment.port.out.UpdateRecruitmentPort;
 import com.acm.server.domain.Recruitment;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class UpdateRecruitmentService implements UpdateRecruitmentUseCase {
     private final UpdateRecruitmentPort updatePort;
+    private final RecruitmentRedisPort recruitmentRedis;
 
     @Override
     @Transactional
@@ -57,7 +59,10 @@ public class UpdateRecruitmentService implements UpdateRecruitmentUseCase {
                         cmd.url() != null ? cmd.url() : current.getUrl()
                 )
                 .build();
-
-        return updatePort.save(toSave);
+        Recruitment rec = updatePort.save(toSave);
+        recruitmentRedis.evictRecruitment(rec.getId());
+        recruitmentRedis.evictAll();
+        recruitmentRedis.evictMain();
+        return rec;
     }
 }

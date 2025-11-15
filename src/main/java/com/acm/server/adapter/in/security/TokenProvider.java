@@ -52,7 +52,7 @@ public class TokenProvider {
                 .compact();
     }
 
-    /** RefreshToken 생성 (email은 보통 포함 안 함) */
+    /** RefreshToken 생성 */
     public String createRefreshToken(String userId, String sessionId) {
         Instant now = Instant.now();
         return Jwts.builder()

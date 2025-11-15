@@ -36,6 +36,7 @@ public class RecruitmentController {
     private final UpdateRecruitmentUseCase updateRecruitmentUseCase;
     private final ManageRecruitmentImagesUseCase manageRecruitmentImagesUseCase;
 
+    //================조회=======================
     @GetMapping
     public Response getRecruitments() {
         var data = findRecruitmentUseCase.findAllRecruitment(); // 그냥 domain 반환
@@ -49,6 +50,7 @@ public class RecruitmentController {
         return new Response(200, "success", data);
     }
 
+
     @Operation(summary = "모집공고 ID로 모집공고 상세 조회")
     @GetMapping("/{recruitmentId}")
     public Response getRecruitmentById(@PathVariable Long recruitmentId, @AuthenticationPrincipal JwtUserPrincipal principal) {
@@ -61,12 +63,15 @@ public class RecruitmentController {
         return new Response(200, "success", data);
     }
 
+
     @GetMapping("/main")
     public Response getMainRecruitment() {
         var data = findRecruitmentUseCase.getMainRecruitment();
         return new Response(200, "success", data);
     }
     
+
+    //==================모집공고 수정==========================
     @Operation(
             summary = "모집공고 삭제",
             description = "특정 클럽(clubId)의 모집공고를 삭제합니다. \n\n" +
@@ -90,6 +95,7 @@ public class RecruitmentController {
         }
         findRecruitmentUseCase.deleteRecruitmentById(recruitmentId);
     }
+
 
     @Operation(
             summary = "모집공고 생성",
@@ -116,6 +122,8 @@ public class RecruitmentController {
         var created = createRecruitmentUseCase.createRecruitment(req.toCommand(clubId));
         return new Response(201,"created", created);
     }
+
+
     @Operation(
             summary = "모집공고 부분 수정 (PATCH)",
             description = "기존 모집공고의 내용을 부분 수정합니다. 요청 본문에 포함된 필드만 업데이트됩니다 (PATCH). \n\n" +
@@ -142,12 +150,15 @@ public class RecruitmentController {
         var updated = updateRecruitmentUseCase.updateRecruitment(req.toCommand(recruitmentId));
         return new Response(200, "success", updated);
     }
+
+    //=============이미지=============================
     @GetMapping("/{id}/images")
     @Operation(summary = "모집공고 이미지 조회", description = "모집공고 id를 이용해 해당 공고에 등록된 이미지 URL 리스트를 조회합니다.")
     public ResponseEntity<List<String>> getRecruitmentImages(@PathVariable("id") Long recruitmentId) {
         List<String> imageUrls = findRecruitmentUseCase.getRecruitmentImageUrls(recruitmentId);
         return ResponseEntity.ok(imageUrls);
     }
+
 
     @Operation(
             summary = "모집공고 이미지 업로드 (여러 장)",
@@ -169,6 +180,7 @@ public class RecruitmentController {
         var data = manageRecruitmentImagesUseCase.upload(principal, recruitmentId, files);
         return new Response(200, "success", data);
     }
+
 
     @Operation(
             summary = "모집공고 이미지 교체 (1장)",
@@ -192,6 +204,7 @@ public class RecruitmentController {
         return new Response(200, "success", data);
     }
 
+
     @Operation(
             summary = "모집공고 이미지 삭제 (1장)",
             description = "url로 지정된 사진 1장을 삭제합니다. (관리자 권한 필요)"
@@ -211,6 +224,7 @@ public class RecruitmentController {
         manageRecruitmentImagesUseCase.deleteOneByUrl(principal, recruitmentId, url);
         return new Response(200, "success", Map.of("deleted", true));
     }
+
 
     @Operation(
             summary = "모집공고 이미지 전체 삭제",

@@ -16,7 +16,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import com.acm.server.application.club.port.in.UpdateClubLogoUseCase;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.http.MediaType;
-import java.time.ZoneId;
 import java.util.Map;
 
 import lombok.RequiredArgsConstructor;

@@ -18,7 +18,7 @@ public class S3ClientConfig {
 
     @Bean
     public S3Client s3Client(S3Properties props, Environment env) {
-        // .env나 application.yml에서 읽은 키
+
         String accessKey = env.getProperty("AWS_ACCESS_KEY_ID");
         String secretKey = env.getProperty("AWS_SECRET_ACCESS_KEY");
 
@@ -26,12 +26,10 @@ public class S3ClientConfig {
 
         if (accessKey != null && secretKey != null &&
             !accessKey.isBlank() && !secretKey.isBlank()) {
-            // 로컬 테스트용: 환경변수 키 직접 사용
             provider = StaticCredentialsProvider.create(
                     AwsBasicCredentials.create(accessKey, secretKey)
             );
         } else {
-            // 배포 환경(EC2, IAM Role)에서는 자동으로 Role 자격증명 사용
             provider = DefaultCredentialsProvider.create();
         }
 

@@ -5,6 +5,7 @@ import com.acm.server.application.club.port.out.FileStoragePort;
 import com.acm.server.application.recruitment.port.in.ManageRecruitmentImagesUseCase;
 import com.acm.server.application.recruitment.port.out.FindRecruitmentPort;
 import com.acm.server.application.recruitment.port.out.ManageRecruitmentImagesPort;
+import com.acm.server.application.recruitment.port.out.RecruitmentImageRedisPort;
 import com.acm.server.domain.Recruitment;
 import com.acm.server.domain.RecruitmentImage;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class ManageRecruitmentImagesService implements ManageRecruitmentImagesUs
     private final FindRecruitmentPort findRecruitmentPort;       // 모집공고 조회 (권한 검사용)
     private final ManageRecruitmentImagesPort imageDbPort;       // 모집공고 이미지 DB (Out)
     private final FileStoragePort fileStoragePort;             // 파일 스토리지 (Out)
+    private final RecruitmentImageRedisPort recruitmentImageRedisPort; 
 
     @Override
     public List<RecruitmentImage> upload(JwtUserPrincipal principal, Long recruitmentId, List<MultipartFile> files) {
@@ -51,6 +53,7 @@ public class ManageRecruitmentImagesService implements ManageRecruitmentImagesUs
                 throw new RuntimeException("Failed to upload recruitment image", e);
             }
         }
+        recruitmentImageRedisPort.evictImageUrls(recruitmentId);
         return saved.stream().sorted(Comparator.comparing(RecruitmentImage::getId)).toList();
     }
 
@@ -78,7 +81,7 @@ public class ManageRecruitmentImagesService implements ManageRecruitmentImagesUs
                     .build();
             var saved = imageDbPort.save(newDomain);
 
-            // 4. (선택) S3의 oldFile 삭제 (ClubLogoService의 deleteOldIfExists 참조)
+            recruitmentImageRedisPort.evictImageUrls(recruitmentId);
 
             return saved;
         } catch (Exception e) {
@@ -98,7 +101,7 @@ public class ManageRecruitmentImagesService implements ManageRecruitmentImagesUs
         // 3. DB에서 삭제
         imageDbPort.deleteByRecruitmentIdAndUrl(recruitmentId, url);
 
-        // 4. (선택) S3 파일 삭제
+        recruitmentImageRedisPort.evictImageUrls(recruitmentId);
     }
 
     @Override
@@ -109,7 +112,9 @@ public class ManageRecruitmentImagesService implements ManageRecruitmentImagesUs
         // 2. (선택) S3 파일 일괄 삭제
 
         // 3. DB에서 일괄 삭제
+
         imageDbPort.deleteAllByRecruitmentId(recruitmentId);
+        recruitmentImageRedisPort.evictImageUrls(recruitmentId);
     }
 
     /**

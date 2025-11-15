@@ -40,7 +40,6 @@ public class S3StorageAdapter implements FileStoragePort {
                 .build());
     }
 
-    // ✅ 로고도 매 업로드마다 새 키 (파일명 변경)
     @Override
     public String clubLogoKey(Long clubId, @Nullable String originalFilename) {
         String ext = ext(originalFilename);

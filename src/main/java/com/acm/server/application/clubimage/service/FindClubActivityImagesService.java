@@ -24,18 +24,18 @@ public class FindClubActivityImagesService implements FindClubActivityImagesUseC
     @Override
     public List<ClubActivityImage> findByClubId(Long clubId) {
 
-        // 1) 클럽 존재 검증
+        // 클럽 존재 검증
         findClubPort.findClub(clubId)
             .orElseThrow(() -> new ResourceNotFoundException("Club not found: " + clubId));
 
-        // 2) 캐시 조회
+        // 캐시 조회
         var cached = redisPort.getImages(clubId);
         if (cached.isPresent()) return cached.get();
 
-        // 3) 캐시 없으면 DB 조회
+        // 캐시 없으면 DB 조회
         List<ClubActivityImage> result = loadPort.loadByClubId(clubId);
 
-        // 4) Redis 저장
+        // Redis 저장
         redisPort.saveImages(clubId, result);
 
         return result;
