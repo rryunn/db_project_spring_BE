@@ -35,6 +35,13 @@ public class RecruitmentPersistenceAdapter implements FindRecruitmentPort, Creat
                 .toList();
     }
 
+    @Override
+    public List<Recruitment> findAllRecruitmentForRedis() {
+        return jpaRecruitmentRepository.findAllForRedis().stream()
+                .map(this::mapToDomain)
+                .toList();
+    }
+
 
     @Override
     public List<Recruitment> getMainRecruitment() {
