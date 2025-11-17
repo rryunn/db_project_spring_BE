@@ -31,7 +31,7 @@ public class RecruitmentCounterSyncService {
         log.info("[RecruitmentCounterSync] Start syncing counters Redis -> DB");
 
         // 1) 모든 모집공고 id 목록 가져오기
-        List<Recruitment> recruitments = findRecruitmentPort.findAllRecruitment();
+        List<Recruitment> recruitments = findRecruitmentPort.findAllRecruitmentForRedis();
         if (recruitments.isEmpty()) {
             log.info("[RecruitmentCounterSync] No recruitments found. Skip.");
             return;

@@ -12,6 +12,7 @@ public interface FindRecruitmentPort {
     List<Recruitment> getMainRecruitment();
     List<String> getRecruitmentImageUrls(Long id);
     List<Recruitment> findRecruitmentsByClubId(Long clubId);
+    List<Recruitment> findAllRecruitmentForRedis();
 
     //캐싱용도
     List<RecruitmentCounterProjection> findAllForCounterInit();

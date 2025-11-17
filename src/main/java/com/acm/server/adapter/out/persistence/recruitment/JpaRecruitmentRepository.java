@@ -17,16 +17,19 @@ public interface JpaRecruitmentRepository extends JpaRepository<RecruitmentEntit
     //List<RecruitmentEntity> findByEndDateAfterOrderByEndDateAsc(LocalDate now, Pageable pageable);
 
     @EntityGraph(attributePaths = "club")  // ✅ club 같이 가져오게
-    @Query("select r from RecruitmentEntity r")
+    @Query("select r from RecruitmentEntity r where r.semester = '25-2'")
     List<RecruitmentEntity> findAllWithClub();
+
+    @EntityGraph(attributePaths = "club")  // ✅ club 같이 가져오게
+    @Query("select r from RecruitmentEntity r ")
+    List<RecruitmentEntity> findAllForRedis();
 
     @EntityGraph(attributePaths = "club")
     List<RecruitmentEntity> findByClub_Id(Long clubId);
-    @Query("SELECT r FROM RecruitmentEntity r " +
-            "WHERE r.type = '상시모집' OR " +
-            "(r.type = '수시모집' AND r.endDate >= CURRENT_DATE)")
-
+    
     @EntityGraph(attributePaths = "club")
+    @Query("SELECT r FROM RecruitmentEntity r " +
+            "WHERE r.endDate >= CURRENT_DATE")
     List<RecruitmentEntity> findMainRecruitments();
 
     @Query("""
