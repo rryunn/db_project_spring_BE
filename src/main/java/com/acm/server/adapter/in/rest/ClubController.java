@@ -157,7 +157,7 @@ public class ClubController {
             @RequestParam(required = false) Boolean isRecruiting,
             @RequestParam(required = false) String department) {
 
-        var clubs = findClubUseCase.findAllClub();
+        var clubs = findClubUseCase.findFilterClub(type, category, isRecruiting, department);
   
         var data = clubs.stream()
                 .map(c -> ClubSummaryResponse.builder()
