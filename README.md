@@ -1,9 +1,6 @@
 # 📘 a Club Server
-
-<img width="4320" height="4320" alt="1" src="https://github.com/user-attachments/assets/82de8b8f-16f5-4d08-8629-8926670f1aca" />
-
-이 프로젝트는 **Spring Boot 기반 백엔드 서버**로, AWS 인프라 환경에서 동작합니다.  
-React 프론트엔드는 GitHub Pages에서 제공되며, EC2의 Nginx Reverse Proxy에서 HTTPS 트래픽을 처리합니다.
+ - 이 프로젝트는 **Spring Boot 기반 백엔드 서버**로, AWS 인프라 환경에서 동작합니다.
+ - React 프론트엔드는 GitHub Pages에서 제공되며, EC2의 Nginx Reverse Proxy에서 HTTPS 트래픽을 처리합니다.
 ---
 
 ## 🏗️ 시스템 아키텍처 (3-Tier Architecture)
