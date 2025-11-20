@@ -1,10 +1,9 @@
-# 📘 a Club Server Application
+# 📘 a Club Server
+
+<img width="4320" height="4320" alt="1" src="https://github.com/user-attachments/assets/82de8b8f-16f5-4d08-8629-8926670f1aca" />
 
 이 프로젝트는 **Spring Boot 기반 백엔드 서버**로, AWS 인프라 환경에서 동작합니다.  
 React 프론트엔드는 GitHub Pages에서 제공되며, EC2의 Nginx Reverse Proxy에서 HTTPS 트래픽을 처리합니다.
-
-Docker 기반으로 로컬에서도 동일 환경에서 쉽게 실행할 수 있도록 구성되어 있습니다.
-
 ---
 
 ## 🏗️ 시스템 아키텍처 (3-Tier Architecture)
@@ -31,10 +30,11 @@ Redis / RDS(MySQL) / S3 (Private Subnet)
 
 ### **3. Data Tier**
 - AWS RDS (MySQL 호환)
-
+<img width="12794" height="5347" alt="Architecture" src="https://github.com/user-attachments/assets/61563d4c-95c6-4940-b8ad-00b088b27e02" />
 ---
 
 ## ⚡ Redis 기반 캐시 구조
+<img width="25579" height="11898" alt="Cache" src="https://github.com/user-attachments/assets/51d3f714-9541-4b3e-8c6f-53af68f4f449" />
 
 ### 🔵 **1. Club Cache (정적 캐시)**
 - 동아리 리스트/상세 데이터 캐싱  
@@ -93,8 +93,15 @@ auth:blacklist:{tokenId}
 
 ---
 
+## ERD
+
+<img width="1528" height="1102" alt="ERD" src="https://github.com/user-attachments/assets/07217d3b-fed4-4bcf-9cb3-653faef601e2" />
+
+---
+
 ## 📂 프로젝트 구조
 
+```
 project-root
 ├── src/
 ├── .env # 환경 변수 (DB 및 Spring 프로필 설정)
@@ -104,7 +111,7 @@ project-root
 └── src/main/resources/
 ├── application.yml
 └── application-db.yml
-
+```
 ---
 
 ## ⚙️ 실행 전 준비
@@ -129,20 +136,15 @@ SPRING_PROFILES_ACTIVE=db
 SPRING_DATASOURCE_URL=jdbc:mysql://${DBHOST}:${DBPORT}/${DATABASE}
 SPRING_DATASOURCE_USERNAME=${DBUSER}
 SPRING_DATASOURCE_PASSWORD=${DBPASSWORD}
-2. Docker 실행
-bash
-코드 복사
-docker compose up --build
-3. 접속
-애플리케이션: http://localhost:8080
+```
+### 2. Docker 실행
 
+```bash
+\docker compose up --build
+```
+### 3. 접속
+애플리케이션: http://localhost:8080
 Swagger UI: http://localhost:8080/swagger-ui
 
-📝 기타
+### 📝 기타
 민감 정보는 반드시 .env로 관리
-
-로그 확인
-
-bash
-코드 복사
-docker compose logs app
