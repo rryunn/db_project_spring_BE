@@ -9,6 +9,7 @@ Docker 기반으로 로컬에서도 동일 환경에서 쉽게 실행할 수 있
 
 ## 🏗️ 시스템 아키텍처 (3-Tier Architecture)
 
+```
 Client (Browser)
 ↓
 GitHub Pages (React)
@@ -18,6 +19,7 @@ Nginx (EC2 Public Subnet, HTTPS)
 Spring Boot App (EC2 Private Subnet)
 ↓
 Redis / RDS(MySQL) / S3 (Private Subnet)
+```
 
 ### **1. Presentation Tier**
 - GitHub Pages
@@ -51,9 +53,6 @@ club:list
 **Key 예시**
 recruitment:{recruitmentId}
 recruitment:list:{clubId}
-
-yaml
-코드 복사
 
 ---
 
